@@ -65,5 +65,18 @@
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   };
 
-  P.ui = { $, el, localize, SAMPLES, thumb, avatar, downloadStyle };
+  // A destructive button that needs a second click within 2.5 s.
+  const confirmButton = (label, onConfirm) => {
+    let armed = false;
+    const b = el('button', { class: 'btn small danger', text: label });
+    b.onclick = () => {
+      if (armed) return onConfirm();
+      armed = true;
+      b.textContent = P.t('confirmSure');
+      setTimeout(() => { armed = false; b.textContent = label; }, 2500);
+    };
+    return b;
+  };
+
+  P.ui = { $, el, localize, SAMPLES, thumb, avatar, downloadStyle, confirmButton };
 })();

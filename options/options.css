@@ -39,6 +39,9 @@
 .ch-info select { width: 100%; }
 .ch-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .pin { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--red); margin-left: 6px; vertical-align: middle; }
+.data-note { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin: -8px 0 24px; padding: 12px 16px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); }
+.data-note p { margin: 0; max-width: 760px; font-size: 13px; color: var(--muted); }
+.data-note a { color: var(--ink); }
 .empty { padding: 40px; border: 1.5px dashed var(--line); border-radius: 12px; text-align: center; color: var(--muted); margin-bottom: 30px; }
 .empty b { color: var(--ink); display: block; font-size: 18px; margin-bottom: 4px; }
 .more { margin: 10px 0 0; }

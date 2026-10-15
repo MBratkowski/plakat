@@ -130,6 +130,13 @@ Then add the file to `manifest.json`, `options/options.html`, `popup/popup.html`
 - **Gallery.** Open `dev/gallery.html?style=<id>` from disk to see every variant of a style, with each channel's avatar under its poster and at 96, 40 and 24 px. Add `&salt=<n>` to shift all seeds.
 - **End-to-end tests.** `python3 dev/e2e.py [editor]` launches Chromium with the extension against `dev/mock-youtube.html`: old and new YouTube DOM, Shorts, search, the player, the watch page owner, guide subscriptions, comments, the channel header, element recycling, late hydration and Trusted Types. It prints one line per assertion and saves screenshots to `$TMPDIR/plakat-e2e/`. Needs `pip install playwright && playwright install chromium`.
 
+## Publishing
+
+- **Package.** `python3 dev/package.py` builds `dist/plakat-<version>.zip` with only what the extension loads, and refuses to build when a referenced file is missing or the name or summary is over the Chrome Web Store limits.
+- **Store graphics.** `python3 dev/webstore.py` renders the 1280×800 screenshots (Polish and English), the 440×280 promo tile and the 1400×560 marquee into `webstore/`, from `dev/webstore.html` and the mock with the extension loaded.
+- **Listing.** [`webstore/listing.md`](webstore/listing.md) holds the descriptions, the single-purpose statement, permission justifications, data-usage answers and a pre-submit checklist.
+- **Privacy.** The policy lives at [mbratkowski.github.io/plakat/privacy.html](https://mbratkowski.github.io/plakat/privacy.html) (`docs/privacy.html`). Update it, and its date, whenever the extension stores or reads something new.
+
 ## Roadmap
 
 - Music titles ("Artist - Song") should feature the song, not the artist.

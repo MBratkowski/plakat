@@ -3,7 +3,7 @@
     "message": "Plakat — miniatury jak plakaty"
   },
   "extDescription": {
-    "message": "Zamienia miniatury i awatary kanałów na YouTube w generatywne plakaty: szwajcarskie, Bauhaus, konstruktywizm, jazz, minimalizm. Styl dobierany per kanał."
+    "message": "Zamienia miniatury i awatary kanałów na YouTube w generatywne plakaty. Każdy kanał dostaje własną serię w jednym z pięciu stylów."
   },
   "switchEnabled": {
     "message": "Włączone na YouTube"
@@ -89,6 +89,15 @@
   },
   "channelsLede": {
     "message": "Kanały pojawiają się tu same, kiedy przeglądasz YouTube. „Losowy” bierze styl z puli na podstawie seedu kanału. Wybór konkretnego stylu przypina go na stałe."
+  },
+  "channelsDataNote": {
+    "message": "Ta lista powstaje tylko w Twojej przeglądarce: Plakat zapisuje nazwy kanałów, tytuły ostatnio widzianych filmów i adresy awatarów, żeby pokazać tu podgląd. Nic nie jest wysyłane na zewnątrz."
+  },
+  "privacyPolicy": {
+    "message": "Polityka prywatności"
+  },
+  "channelsClear": {
+    "message": "Wyczyść listę kanałów"
   },
   "channelsEmpty": {
     "message": "Jeszcze pusto"

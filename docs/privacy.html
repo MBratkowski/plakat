@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plakat — privacy policy</title>
+<meta name="description" content="What the Plakat Chrome extension stores, what it reads on YouTube and what it sends: nothing leaves your browser.">
+<meta name="theme-color" content="#f1ede4">
+<link rel="icon" href="assets/icon32.png">
+<style>
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-900-normal.woff2) format("woff2");font-weight:900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-900-normal.woff2) format("woff2");font-weight:900;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+:root { --paper: #f1ede4; --ink: #111111; --body: #3d3a35; --muted: #5f5a52; --line: #cfc7b6; --red: #e5322d; --red-text: #c8201e; --blue: #1f4fd8; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Inter Tight", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); }
+a:hover { color: var(--red-text); }
+a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.wrap { max-width: 820px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-block: 22px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 24px; letter-spacing: -0.05em; }
+.mark { position: relative; width: 30px; height: 30px; border-radius: 6px; background: #e7e1d4; overflow: hidden; }
+.mark::before { content: ""; position: absolute; right: 4px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--red); }
+.mark::after { content: ""; position: absolute; left: 4px; right: 4px; bottom: 4px; height: 4px; background: var(--ink); }
+.langs { display: flex; gap: 18px; font-weight: 700; font-size: 15px; }
+.meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-size: 14px; font-weight: 700; }
+.meta span + span { font-weight: 400; }
+h1 { margin: 40px 0 16px -0.03em; font-weight: 900; font-size: clamp(44px, 8vw, 84px); line-height: 0.92; letter-spacing: -0.055em; }
+.lede { margin: 0 0 8px; font-size: 21px; line-height: 1.45; }
+section { padding: 24px 0 8px; }
+section + section { border-top: 1px solid var(--line); margin-top: 40px; }
+h2 { margin: 36px 0 10px; font-size: 24px; letter-spacing: -0.02em; }
+p, li { color: var(--body); }
+ul { padding-left: 1.2em; }
+li + li { margin-top: 6px; }
+code { font: 0.92em ui-monospace, "SF Mono", Menlo, monospace; }
+.kicker { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red-text); }
+footer { margin-top: 64px; padding: 28px 0 56px; border-top: 2px solid var(--ink); font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="./"><span class="mark" aria-hidden="true"></span>Plakat</a>
+  <nav class="langs" aria-label="Language"><a href="#en" hreflang="en">English</a><a href="#pl" hreflang="pl">Polski</a></nav>
+</header>
+
+<main class="wrap">
+  <div class="meta"><span>Plakat — Chrome extension</span><span>Last updated: 15 October 2026</span></div>
+
+  <section id="en" lang="en">
+    <p class="kicker">Privacy policy</p>
+    <h1>Nothing leaves your browser.</h1>
+    <p class="lede">Plakat redraws YouTube thumbnails and channel avatars as posters. It has no servers, no analytics and no account. Everything it needs, it keeps on your computer.</p>
+
+    <h2>What Plakat stores</h2>
+    <p>In Chrome’s extension storage on your device (<code>chrome.storage.local</code>):</p>
+    <ul>
+      <li><b>Settings:</b> the on/off switches, which styles take part in the draw, your own styles, and the style or reroll you chose for a channel.</li>
+      <li><b>Channels you have seen:</b> for up to 400 channels, the channel’s address on YouTube (such as <code>@handle</code>), its name, the IDs and titles of up to 12 recently seen videos, the address of its avatar image and when you last saw it. This list exists only so the settings page can preview each channel’s posters on its real titles.</li>
+    </ul>
+
+    <h2>What Plakat reads on YouTube</h2>
+    <p>On <code>www.youtube.com</code> it reads what it needs to draw a poster: video titles, channel names and links, and the addresses of thumbnail and avatar images. This happens inside your browser.</p>
+
+    <h2>What Plakat sends</h2>
+    <p>Nothing. Plakat makes no requests of its own and shares, sells or transfers no data to anyone. Posters use YouTube’s own thumbnail and avatar images, which load from YouTube’s image servers exactly as they do without the extension. Typefaces are bundled with the extension.</p>
+
+    <h2>Your control</h2>
+    <ul>
+      <li>The settings page has a <b>Wyczyść listę kanałów</b> (“Clear the channel list”) button that deletes every seen channel at once.</li>
+      <li>Alt+Shift+P on YouTube turns the posters off and on.</li>
+      <li>Removing the extension deletes everything it stored.</li>
+    </ul>
+
+    <h2>Chrome Web Store User Data Policy</h2>
+    <p>The use of information received by Plakat adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements. Data is used only to draw posters and to preview them on the settings page, never for advertising, and no person reads it.</p>
+
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, the new version will be published on this page with a new date. Questions: <a href="https://github.com/MBratkowski/plakat/issues">open an issue on GitHub</a>.</p>
+  </section>
+
+  <section id="pl" lang="pl">
+    <p class="kicker">Polityka prywatności</p>
+    <h1>Nic nie opuszcza Twojej przeglądarki.</h1>
+    <p class="lede">Plakat zamienia miniatury i awatary kanałów na YouTube w plakaty. Nie ma serwerów, analityki ani kont. Wszystko, czego potrzebuje, trzyma na Twoim komputerze.</p>
+
+    <h2>Co Plakat zapisuje</h2>
+    <p>W pamięci rozszerzeń Chrome na Twoim urządzeniu (<code>chrome.storage.local</code>):</p>
+    <ul>
+      <li><b>Ustawienia:</b> przełączniki, style biorące udział w losowaniu, Twoje własne style oraz styl albo przelosowanie wybrane dla kanału.</li>
+      <li><b>Kanały, które widziałeś:</b> dla maksymalnie 400 kanałów adres kanału na YouTube (np. <code>@nazwa</code>), jego nazwę, identyfikatory i tytuły do 12 ostatnio widzianych filmów, adres obrazka awatara i datę ostatniego wyświetlenia. Ta lista istnieje tylko po to, żeby strona ustawień mogła pokazać podgląd plakatów każdego kanału na jego prawdziwych tytułach.</li>
+    </ul>
+
+    <h2>Co Plakat odczytuje na YouTube</h2>
+    <p>Na <code>www.youtube.com</code> odczytuje to, czego potrzebuje do narysowania plakatu: tytuły filmów, nazwy i linki kanałów oraz adresy obrazków miniatur i awatarów. Dzieje się to w Twojej przeglądarce.</p>
+
+    <h2>Co Plakat wysyła</h2>
+    <p>Nic. Plakat nie wykonuje własnych zapytań sieciowych i nikomu nie udostępnia, nie sprzedaje ani nie przekazuje danych. Plakaty korzystają z obrazków miniatur i awatarów YouTube’a, które ładują się z serwerów YouTube’a tak samo jak bez rozszerzenia. Kroje pisma są dołączone do rozszerzenia.</p>
+
+    <h2>Kontrola</h2>
+    <ul>
+      <li>Na stronie ustawień przycisk <b>Wyczyść listę kanałów</b> usuwa od razu wszystkie zapisane kanały.</li>
+      <li>Alt+Shift+P na YouTube wyłącza i włącza plakaty.</li>
+      <li>Odinstalowanie rozszerzenia usuwa wszystko, co zapisało.</li>
+    </ul>
+
+    <h2>Zasady Chrome Web Store dotyczące danych</h2>
+    <p>Sposób, w jaki Plakat korzysta z otrzymanych informacji, jest zgodny z Zasadami dotyczącymi danych użytkownika w Chrome Web Store, w tym z wymaganiami ograniczonego użytkowania (Limited Use). Dane służą tylko do rysowania plakatów i ich podglądu w ustawieniach, nigdy do reklam, i nikt ich nie czyta.</p>
+
+    <h2>Zmiany i kontakt</h2>
+    <p>Jeśli ta polityka się zmieni, nowa wersja pojawi się na tej stronie z nową datą. Pytania: <a href="https://github.com/MBratkowski/plakat/issues">zgłoś je na GitHubie</a>.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p><a href="./">Plakat</a> · <a href="https://github.com/MBratkowski/plakat">Source on GitHub</a> · Not affiliated with YouTube or Google.</p>
+</footer>
+</body>
+</html>

@@ -8,6 +8,9 @@
 
   P.loadSeen = async () => (await chrome.storage.local.get('seen')).seen || {};
 
+  // Forgets every seen channel. Settings (pinned styles, rerolls) stay.
+  P.clearSeen = () => chrome.storage.local.remove('seen');
+
   P.thumbFor = (vid, portrait) => `https://i.ytimg.com/vi/${vid}/${portrait ? 'hqdefault' : 'mqdefault'}.jpg`;
 
   // Pure merge of buffered observations into the stored map. A channel seen only

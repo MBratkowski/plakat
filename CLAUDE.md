@@ -17,6 +17,7 @@ A Chrome MV3 extension that overlays YouTube thumbnails and channel avatars with
 - `dev/gallery.html?style=<id>`, opened from disk, shows every variant of a style on sample titles, with avatars.
 - `python3 dev/e2e.py [editor]` runs Playwright + Chromium with the extension loaded. `youtube.com` is replaced by `dev/mock-youtube.html` (old and new DOM, Shorts, search, player, `#owner`, guide subscriptions, comments, channel header on `/@handle`, element recycling, late hydration, Trusted Types). It prints assertions and saves screenshots to `$TMPDIR/plakat-e2e/`. Requires `pip install playwright && playwright install chromium`.
 - Engine refactors must not change existing posters: render a fixed matrix with `P.toString(P.render(...))` before and after, and diff the strings.
+- Releasing: bump `version` in `manifest.json`, run `python3 dev/package.py` (it validates the package and store limits) and, if the look changed, `python3 dev/webstore.py`. Submission details are in `webstore/listing.md`. Anything new that the extension stores or reads must also go into `docs/privacy.html`.
 
 ## Backlog: from the first run on a real feed
 

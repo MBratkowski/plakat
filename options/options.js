@@ -1,7 +1,7 @@
 // Options page: general switches, seen channels, the style library and the editor.
 (async () => {
   const P = Plakat;
-  const { $, el, localize, SAMPLES, thumb, avatar, downloadStyle } = P.ui;
+  const { $, el, localize, SAMPLES, thumb, avatar, downloadStyle, confirmButton } = P.ui;
 
   localize();
   await P.loadFonts();
@@ -89,9 +89,19 @@
     return row;
   };
 
+  // The seen list lives only in this browser; the data note says so and lets the user wipe it.
+  const clearSeen = confirmButton(P.t('channelsClear'), async () => {
+    await P.clearSeen();
+    state.seen = {};
+    renderChannels();
+  });
+  clearSeen.id = 'clearSeen';
+  $('#dataNote').appendChild(clearSeen);
+
   const renderChannels = () => {
     const { seen } = state;
     const box = $('#channels');
+    clearSeen.disabled = !Object.keys(seen).length;
     const q = $('#chSearch').value.trim().toLowerCase();
     const keys = Object.keys(seen)
       .filter((k) => !q || k.includes(q) || (seen[k].name || '').toLowerCase().includes(q))
@@ -113,17 +123,6 @@
   $('#chSearch').addEventListener('input', () => { chLimit = 25; renderChannels(); });
 
   // ---------- 03 Styles ----------
-  const confirmButton = (label, onConfirm) => {
-    let armed = false;
-    const b = el('button', { class: 'btn small danger', text: label });
-    b.onclick = () => {
-      if (armed) return onConfirm();
-      armed = true;
-      b.textContent = P.t('confirmSure');
-      setTimeout(() => { armed = false; b.textContent = label; }, 2500);
-    };
-    return b;
-  };
 
   const removeStyle = (id) => {
     const { settings } = state;
