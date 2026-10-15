@@ -137,4 +137,4 @@ Then add the file to `manifest.json`, `options/options.html`, `popup/popup.html`
 
 ## Credits
 
-Typefaces: [Inter Tight](https://fontsource.org/fonts/inter-tight), [Jost](https://fontsource.org/fonts/jost), [Oswald](https://fontsource.org/fonts/oswald) and [Cormorant Garamond](https://fontsource.org/fonts/cormorant-garamond), bundled from Fontsource under the SIL Open Font License 1.1.
+Typefaces: [Inter Tight](https://fontsource.org/fonts/inter-tight), [Jost](https://fontsource.org/fonts/jost), [Oswald](https://fontsource.org/fonts/oswald) and [Cormorant Garamond](https://fontsource.org/fonts/cormorant-garamond), bundled from Fontsource under the SIL Open Font License 1.1 (see [`fonts/OFL.txt`](fonts/OFL.txt)).
