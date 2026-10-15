@@ -1,15 +1,31 @@
 <!doctype html>
-<html lang="pl">
+<html lang="pl" dark>
 <head>
 <meta charset="utf-8">
 <title>YouTube (mock)</title>
 <style>
-  body { margin: 0; background: #0f0f0f; color: #f1f1f1; font: 14px Roboto, Arial, sans-serif; }
+  /* YouTube's colour tokens, light and dark (html[dark], the default here), declared the way
+     YouTube does. The page below only paints with them, like YouTube's components. */
+  html:not(.style-scope) {
+    --yt-spec-base-background: #ffffff; --yt-spec-raised-background: #ffffff; --yt-spec-menu-background: #ffffff;
+    --yt-spec-general-background-a: #f9f9f9; --yt-spec-inverted-background: #0f0f0f;
+    --yt-spec-text-primary: #0f0f0f; --yt-spec-text-secondary: #606060; --yt-spec-text-primary-inverse: #ffffff;
+    --yt-spec-call-to-action: #065fd4; --yt-spec-brand-button-background: #cc0000; --yt-spec-static-brand-white: #ffffff;
+    --yt-spec-static-brand-red: #ff0000; --yt-spec-10-percent-layer: rgba(0, 0, 0, 0.1); --yt-spec-badge-chip-background: rgba(0, 0, 0, 0.05);
+  }
+  html[dark]:not(.style-scope) {
+    --yt-spec-base-background: #0f0f0f; --yt-spec-raised-background: #212121; --yt-spec-menu-background: #282828;
+    --yt-spec-general-background-a: #181818; --yt-spec-inverted-background: #f1f1f1;
+    --yt-spec-text-primary: #f1f1f1; --yt-spec-text-secondary: #aaaaaa; --yt-spec-text-primary-inverse: #0f0f0f;
+    --yt-spec-call-to-action: #3ea6ff; --yt-spec-brand-button-background: #cc0000; --yt-spec-static-brand-white: #ffffff;
+    --yt-spec-static-brand-red: #ff0000; --yt-spec-10-percent-layer: rgba(255, 255, 255, 0.2); --yt-spec-badge-chip-background: rgba(255, 255, 255, 0.1);
+  }
+  body { margin: 0; background: var(--yt-spec-base-background); color: var(--yt-spec-text-primary); font: 14px Roboto, Arial, sans-serif; }
   ytd-app, ytd-rich-grid-renderer, ytd-rich-item-renderer, ytd-rich-grid-media, ytd-thumbnail, yt-image,
   yt-lockup-view-model, yt-thumbnail-view-model, yt-content-metadata-view-model, ytm-shorts-lockup-view-model,
   ytd-video-renderer, ytd-channel-name, #movie_player, ytd-masthead, ytd-guide-renderer, ytd-comments,
   ytd-comment-thread-renderer, ytd-comment-view-model, ytd-comment-renderer, ytd-video-owner-renderer,
-  yt-page-header-view-model, yt-dynamic-text-view-model { display: block; }
+  yt-page-header-view-model, yt-dynamic-text-view-model, ytd-watch-metadata, yt-chip-cloud-renderer { display: block; }
   yt-image { display: inline; } /* as on real YouTube: an inline wrapper around the img */
   yt-img-shadow, yt-avatar-shape, yt-decorated-avatar-view-model { display: inline-block; vertical-align: top; }
   h2 { font-size: 18px; margin: 24px 24px 12px; }
@@ -26,15 +42,27 @@
   img.av.s120 { width: 120px; height: 120px; }
   .badge { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.8); color: #fff; font-size: 12px; font-weight: 500; padding: 1px 4px; border-radius: 4px; }
   h3 { font-size: 15px; margin: 10px 0 4px; line-height: 1.35; }
-  .meta, ytd-channel-name { color: #aaa; font-size: 13px; }
+  .meta, ytd-channel-name { color: var(--yt-spec-text-secondary); font-size: 13px; }
   #details, .yt-lockup-metadata-view-model { display: flex; gap: 12px; align-items: flex-start; margin-top: 10px; }
   #details h3, .yt-lockup-metadata-view-model h3 { margin-top: 0; }
   #movie_player { margin: 24px; width: 480px; position: relative; }
+  /* Painted with tokens on purpose: the theme must leave the player at YouTube's values. */
+  .ytp-title { padding: 8px 12px; background: var(--yt-spec-raised-background); color: var(--yt-spec-text-primary); font-size: 13px; }
   .search { padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
   ytd-video-renderer { display: flex; gap: 16px; }
   ytd-video-renderer ytd-thumbnail { width: 360px; flex: none; }
   #channel-info { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  ytd-masthead { display: flex; justify-content: flex-end; padding: 8px 24px; border-bottom: 1px solid #222; }
+  ytd-masthead { display: flex; justify-content: flex-end; padding: 8px 24px; border-bottom: 1px solid var(--yt-spec-10-percent-layer); }
+  yt-chip-cloud-renderer { display: flex; gap: 12px; padding: 12px 24px 0; }
+  yt-chip-cloud-chip-renderer { display: inline-block; padding: 6px 12px; border-radius: 8px; background: var(--yt-spec-badge-chip-background); font-weight: 500; }
+  yt-chip-cloud-chip-renderer[selected] { background: var(--yt-spec-inverted-background); color: var(--yt-spec-text-primary-inverse); }
+  ytd-watch-metadata { padding: 0 24px; max-width: 760px; }
+  ytd-watch-metadata h1 { font-size: 20px; margin: 0 0 12px; }
+  ytd-watch-metadata #owner { padding: 0; }
+  yt-button-shape button { border: 0; border-radius: 18px; padding: 9px 16px; font: 500 14px Roboto, Arial, sans-serif;
+    background: var(--yt-spec-brand-button-background); color: var(--yt-spec-static-brand-white); margin-left: 12px; }
+  ytd-watch-metadata #description { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--yt-spec-badge-chip-background); }
+  ytd-watch-metadata #description a { color: var(--yt-spec-call-to-action); }
   ytd-guide-renderer { padding: 0 24px; width: 240px; }
   ytd-guide-entry-renderer a { display: flex; gap: 16px; align-items: center; padding: 6px 0; }
   .row { display: flex; gap: 12px; align-items: center; padding: 0 24px; }
@@ -50,6 +78,7 @@
 <body>
 <ytd-app>
 <ytd-masthead><ytd-topbar-menu-button-renderer><button id="avatar-btn"><yt-img-shadow id="avatar"><img class="av s32" id="me" src="https://yt3.ggpht.com/me=s88"></yt-img-shadow></button></ytd-topbar-menu-button-renderer></ytd-masthead>
+<yt-chip-cloud-renderer><yt-chip-cloud-chip-renderer selected>Wszystko</yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer>Podcasty</yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer>Programowanie</yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer>Projektowanie</yt-chip-cloud-chip-renderer></yt-chip-cloud-renderer>
 <div id="pageHeader"></div>
 <h2>Strona główna — stary DOM (ytd-rich-item-renderer)</h2>
 <div class="grid" id="old"></div>
@@ -60,9 +89,11 @@
 <h2>Wyniki wyszukiwania</h2>
 <div class="search" id="search"></div>
 <h2>Odtwarzacz (ma zostać nietknięty)</h2>
-<div id="movie_player"><a href="/watch?v=ENDSCREEN1"><img class="thumb" src="https://i.ytimg.com/vi/ENDSCREEN1/mqdefault.jpg"></a></div>
+<div id="movie_player"><div class="ytp-title"></div><a href="/watch?v=ENDSCREEN1"><img class="thumb" src="https://i.ytimg.com/vi/ENDSCREEN1/mqdefault.jpg"></a></div>
 <h2>Strona filmu — właściciel (#owner)</h2>
+<ytd-watch-metadata><h1></h1>
 <div class="row" id="owner"></div>
+<div id="description">48 tys. wyświetleń · 3 tygodnie temu<br>Structured concurrency w praktyce: scope, Job, anulowanie i obsługa błędów. <a href="#">…więcej</a></div></ytd-watch-metadata>
 <h2>Menu — subskrypcje (ytd-guide-entry-renderer)</h2>
 <ytd-guide-renderer id="guide"></ytd-guide-renderer>
 <h2>Komentarze (domyślnie nietknięte)</h2>
@@ -144,8 +175,14 @@ for (let i = 4; i < 8; i++) document.getElementById('new').appendChild(newCard(i
 for (let i = 0; i < 6; i++) document.getElementById('shorts').appendChild(shortCard(i));
 for (let i = 1; i < 3; i++) document.getElementById('search').appendChild(searchCard(i));
 for (const entry of guide) document.getElementById('guide').appendChild(guideEntry(entry));
-setHTML(document.getElementById('owner'), `<ytd-video-owner-renderer class="row"><a href="/@androiddevelopers"><yt-img-shadow id="avatar"><img class="av s40" src="${avatarSrc('@androiddevelopers')}"></yt-img-shadow></a>
-  <div id="upload-info"><ytd-channel-name><a href="/@androiddevelopers">Android Developers</a></ytd-channel-name><div class="meta">2,1 mln subskrypcji</div></div></ytd-video-owner-renderer>`);
+// Watch page: the video in ?v= and its owner; without a known v, Android Developers' video.
+const watchedIndex = vids.findIndex((v, i) => vid(i) === new URLSearchParams(location.search).get('v'));
+const [ownerName, ownerHandle, watchedTitle] = vids[watchedIndex < 0 ? 1 : watchedIndex];
+document.querySelector('#movie_player .ytp-title').textContent = watchedTitle;
+document.querySelector('ytd-watch-metadata h1').textContent = watchedTitle;
+setHTML(document.getElementById('owner'), `<ytd-video-owner-renderer class="row"><a href="/${ownerHandle}"><yt-img-shadow id="avatar"><img class="av s40" src="${avatarSrc(ownerHandle)}"></yt-img-shadow></a>
+  <div id="upload-info"><ytd-channel-name><a href="/${ownerHandle}">${ownerName}</a></ytd-channel-name><div class="meta">2,1 mln subskrypcji</div></div></ytd-video-owner-renderer>
+  <yt-button-shape><button>Subskrybuj</button></yt-button-shape>`);
 const comments = document.getElementById('comments');
 comments.appendChild(make('ytd-comment-simplebox-renderer', `<div id="author-thumbnail"><yt-img-shadow><img class="av s40" src="https://yt3.ggpht.com/me=s88"></yt-img-shadow></div> Dodaj komentarz…`));
 comments.appendChild(make('ytd-comment-thread-renderer', '')).appendChild(comment('@ania.k', 'Świetny materiał, dzięki!', false));

@@ -39,6 +39,12 @@
     // Comment avatars only make sense while channel avatars are on.
     $('#commentAvatars').disabled = !state.settings.avatars;
     $('#commentAvatars').closest('.switch-row').classList.toggle('off', !state.settings.avatars);
+    const theme = $('#theme');
+    theme.value = state.settings.theme;
+    theme.onchange = () => {
+      state.settings.theme = theme.value;
+      save();
+    };
   };
 
   // ---------- 02 Channels ----------

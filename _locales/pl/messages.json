@@ -30,6 +30,21 @@
   "switchCommentAvatarsHint": {
     "message": "Autorzy komentarzy to zwykle ludzie, nie kanały, więc domyślnie zostają oryginalne"
   },
+  "themeLabel": {
+    "message": "Motyw YouTube"
+  },
+  "themeHint": {
+    "message": "Przemalowuje samo YouTube: tło, tekst, kroje i kanciaste rogi. „Paleta kanału” bierze kolory z serii kanału na stronie filmu i kanału, a gdzie indziej zostaje papier i tusz. Odtwarzacz zostaje nietknięty."
+  },
+  "themeOff": {
+    "message": "Wyłączony"
+  },
+  "themePaper": {
+    "message": "Papier i tusz"
+  },
+  "themeChannel": {
+    "message": "Paleta kanału"
+  },
   "popupTagline": {
     "message": "miniatury jak plakaty"
   },

@@ -144,6 +144,16 @@
     return { key: key || '_', name };
   };
 
+  // Channel the page belongs to: the channel itself on its own pages, the video's owner
+  // on /watch, null elsewhere (feed, search, Shorts). YouTube keeps a hidden watch page
+  // in the DOM after leaving it, hence the path check before reading #owner.
+  const pageChannelKey = () => {
+    const key = channelKeyFromPath(location.pathname);
+    if (key || location.pathname !== '/watch') return key;
+    const owner = document.querySelector(SEL.owner);
+    return (owner && channelFromLinks(owner)?.key) || null;
+  };
+
   // Name of channel `key` from the closest link that shows it, searching outwards from el.
   const channelNameNear = (el, key) => {
     if (el.matches(SEL.channelLink) && linkKey(el) === key && linkName(el)) return linkName(el);
@@ -178,7 +188,7 @@
   };
 
   P.yt = {
-    SEL, clean, vidFromHref, channelKeyFromPath, findCard, findTitle, findChannel, avatarChannel,
+    SEL, clean, vidFromHref, channelKeyFromPath, findCard, findTitle, findChannel, avatarChannel, pageChannelKey,
     thumbUrl: (img) => imageUrl(img, THUMB_URL),
     avatarUrl: (img) => imageUrl(img, AVATAR_URL),
   };

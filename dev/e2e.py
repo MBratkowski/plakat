@@ -307,6 +307,159 @@ def channel_page_checks(page):
     page.screenshot(path=str(OUT / "channel-page.png"))
 
 
+# The theme: YouTube's tokens on <html> and inside the player, contrast of every text
+# pairing, the theme sheet's data-* and a few typography and corner probes.
+THEME_JS = """() => {
+  const NAMES = ['--yt-spec-base-background', '--yt-spec-raised-background', '--yt-spec-menu-background',
+    '--yt-spec-inverted-background', '--yt-spec-text-primary', '--yt-spec-text-secondary', '--yt-spec-text-primary-inverse',
+    '--yt-spec-call-to-action', '--yt-spec-brand-button-background', '--yt-spec-static-brand-white',
+    '--yt-spec-static-brand-red', '--yt-spec-10-percent-layer', '--yt-spec-badge-chip-background'];
+  const PAIRS = [['text-primary', 'base-background'], ['text-secondary', 'base-background'], ['call-to-action', 'base-background'],
+    ['text-primary', 'raised-background'], ['text-secondary', 'raised-background'], ['text-secondary', 'menu-background'],
+    ['text-primary-inverse', 'inverted-background'], ['text-primary-inverse', 'call-to-action'],
+    ['static-brand-white', 'brand-button-background']];
+  const ctx = document.createElement('canvas').getContext('2d');
+  const rgb = (s) => {
+    ctx.fillStyle = '#000';
+    ctx.fillStyle = s;
+    const v = ctx.fillStyle;
+    return v.startsWith('#') ? [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16)) : v.match(/[\\d.]+/g).slice(0, 3).map(Number);
+  };
+  const lum = (c) => {
+    const [r, g, b] = rgb(c).map((v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const tokens = (el) => {
+    const cs = getComputedStyle(el);
+    return Object.fromEntries(NAMES.map((n) => [n, cs.getPropertyValue(n).trim()]));
+  };
+  const root = tokens(document.documentElement);
+  const sheet = document.getElementById('plakat-theme');
+  const css = (sel, prop) => {
+    const el = document.querySelector(sel);
+    return el ? getComputedStyle(el)[prop] : null;
+  };
+  return {
+    on: document.documentElement.classList.contains('plakat-theme'),
+    sheet: sheet ? { ...sheet.dataset } : null,
+    root,
+    player: tokens(document.querySelector('#movie_player')),
+    bgLum: lum(root['--yt-spec-base-background']),
+    contrast: Object.fromEntries(PAIRS.map(([f, b]) => [`${f} on ${b}`, +ratio(root['--yt-spec-' + f], root['--yt-spec-' + b]).toFixed(2)])),
+    titleFont: css('#video-title', 'fontFamily'),
+    chipFont: css('yt-chip-cloud-chip-renderer', 'fontFamily'),
+    thumbRadius: css('ytd-thumbnail img', 'borderRadius'),
+    chipRadius: css('yt-chip-cloud-chip-renderer', 'borderRadius'),
+    playerThumbRadius: css('#movie_player img', 'borderRadius'),
+    playerTitleFont: css('#movie_player .ytp-title', 'fontFamily'),
+  };
+}"""
+
+
+def theme(page):
+    return page.evaluate(THEME_JS)
+
+
+def set_dark(page, dark):
+    page.evaluate(f"document.documentElement.{'setAttribute' if dark else 'removeAttribute'}('dark', '')")
+    page.wait_for_timeout(300)
+
+
+def theme_checks(context, page, ext_id):
+    page.goto(YT + "/")
+    page.wait_for_timeout(2500)
+    off = theme(page)
+    set_dark(page, False)
+    off_light = theme(page)
+    set_dark(page, True)
+    check("theme: off by default (no sheet, YouTube's own tokens)",
+          not off["on"] and off["sheet"] is None and off["root"]["--yt-spec-base-background"] == "#0f0f0f", off["sheet"])
+    page.screenshot(path=str(OUT / "theme-off.png"))
+
+    opts = context.new_page()
+    opts.goto(f"chrome-extension://{ext_id}/options/options.html")
+    opts.wait_for_selector("body[data-ready]")
+    check("options: theme select defaults to off", opts.input_value("#theme") == "off", opts.input_value("#theme"))
+
+    def contrast_ok(t, label):
+        low = {k: v for k, v in t["contrast"].items() if v < 4.5}
+        check(f"{label}: every text pairing has at least 4.5:1", not low, low)
+
+    def player_untouched(t, before, label):
+        changed = {k: (v, before["root"][k]) for k, v in t["player"].items() if v != before["root"][k]}
+        check(f"{label}: player keeps YouTube's tokens", not changed, changed)
+
+    # Paper and ink.
+    opts.select_option("#theme", "paper")
+    page.wait_for_timeout(800)
+    paper = theme(page)
+    overridden = [k for k, v in paper["root"].items() if v != off["root"][k] and k != "--yt-spec-static-brand-white"]
+    check("paper: theme sheet on", paper["on"] and paper["sheet"] and paper["sheet"]["mode"] == "paper", paper["sheet"])
+    check("paper: YouTube's tokens overridden", len(overridden) == len(paper["root"]) - 1, sorted(set(paper["root"]) - set(overridden)))
+    check("paper (dark): dark background", paper["bgLum"] < 0.05, paper["root"]["--yt-spec-base-background"])
+    contrast_ok(paper, "paper (dark)")
+    player_untouched(paper, off, "paper (dark)")
+    check("paper: titles in the theme typeface", "Plakat Inter Tight" in paper["titleFont"], paper["titleFont"])
+    check("paper: chips in Oswald", "Plakat Oswald" in paper["chipFont"], paper["chipFont"])
+    check("paper: square thumbnails and chips", paper["thumbRadius"] == "0px" and paper["chipRadius"] == "0px", (paper["thumbRadius"], paper["chipRadius"]))
+    check("paper: avatars stay round", all(o["radius"] == "50%" for o in overlays(page, "av")))
+    check("paper: player keeps its corners and type", paper["playerThumbRadius"] == off["playerThumbRadius"] == "12px"
+          and paper["playerTitleFont"] == off["playerTitleFont"], (paper["playerThumbRadius"], paper["playerTitleFont"]))
+    page.screenshot(path=str(OUT / "theme-paper-dark.png"))
+
+    set_dark(page, False)
+    light = theme(page)
+    check("paper (light): light background", light["bgLum"] > 0.6, light["root"]["--yt-spec-base-background"])
+    contrast_ok(light, "paper (light)")
+    player_untouched(light, off_light, "paper (light)")
+    page.screenshot(path=str(OUT / "theme-paper-light.png"))
+    set_dark(page, True)
+
+    # Channel palette: the feed stays on paper, watch and channel pages follow the channel.
+    opts.select_option("#theme", "channel")
+    page.wait_for_timeout(800)
+    feed = theme(page)
+    check("channel: the feed has no channel and falls back to paper",
+          feed["sheet"] and feed["sheet"]["mode"] == "channel" and feed["sheet"]["channel"] == ""
+          and feed["sheet"]["palette"] == paper["sheet"]["palette"], feed["sheet"])
+
+    page.goto(YT + "/watch?v=VID00000001")
+    page.wait_for_timeout(1500)
+    watch = theme(page)
+    owner = overlays(page, "av", "#owner")
+    check("channel: watch page themed with the owner's series",
+          watch["sheet"] and watch["sheet"]["channel"] == "@androiddevelopers" and owner and watch["sheet"]["palette"] == owner[0]["palette"],
+          (watch["sheet"], owner and owner[0]["palette"]))
+    contrast_ok(watch, "channel (watch, dark)")
+    player_untouched(watch, off, "channel (watch, dark)")
+    page.locator("ytd-watch-metadata").scroll_into_view_if_needed()
+    page.screenshot(path=str(OUT / "theme-channel-watch.png"))
+
+    page.goto(YT + "/@designtalks")
+    page.wait_for_timeout(1500)
+    chan = theme(page)
+    header = overlays(page, "av", "yt-page-header-view-model")
+    thumbs = {o["palette"] for o in overlays(page, "thumb") if o["key"] == "@designtalks"}
+    check("channel: channel page themed with the channel's series",
+          chan["sheet"] and chan["sheet"]["channel"] == "@designtalks" and header
+          and {chan["sheet"]["palette"]} == {header[0]["palette"]} == thumbs, (chan["sheet"], thumbs))
+    check("channel: different channels, different themes", chan["root"] != watch["root"])
+    contrast_ok(chan, "channel (channel page, dark)")
+    page.screenshot(path=str(OUT / "theme-channel-page-dark.png"))
+    set_dark(page, False)
+    chan_light = theme(page)
+    contrast_ok(chan_light, "channel (channel page, light)")
+    page.screenshot(path=str(OUT / "theme-channel-page-light.png"))
+    set_dark(page, True)
+
+    opts.select_option("#theme", "off")
+    page.wait_for_timeout(800)
+    back = theme(page)
+    check("theme off again: sheet removed, YouTube's tokens back", not back["on"] and back["sheet"] is None and back["root"] == off["root"], back["sheet"])
+    opts.close()
+
+
 def main():
     with_editor = "editor" in sys.argv[1:]
     OUT.mkdir(parents=True, exist_ok=True)
@@ -327,6 +480,8 @@ def main():
         if ext_id:
             options_checks(context, page, ext_id, with_editor)
         channel_page_checks(page)
+        if ext_id:
+            theme_checks(context, page, ext_id)
         context.close()
     print(f"\n{'OK' if not failures else f'{len(failures)} FAILED'}  ·  screenshots: {OUT}")
     sys.exit(1 if failures else 0)

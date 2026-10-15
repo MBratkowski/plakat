@@ -30,3 +30,43 @@ html.plakat-off .plakat-ov { display: none !important; }
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .plakat-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Theme (settings.theme, off by default): typography and square corners. Colours and the
+   --plakat-* typefaces come from the <style id="plakat-theme"> written by theme.js.
+   Selectors follow ids and custom element names, and nothing reaches into the player
+   or into our own overlays. */
+html.plakat-theme :is(#video-title, yt-lockup-view-model h3, ytm-shorts-lockup-view-model h3, ytd-reel-item-renderer h3,
+  ytd-video-renderer h3, ytd-watch-metadata h1, yt-page-header-view-model h1, ytd-rich-shelf-renderer #title,
+  ytd-shelf-renderer #title, ytd-app h2):not(#movie_player *, .html5-video-player *),
+html.plakat-theme :is(#video-title, yt-lockup-view-model h3, ytm-shorts-lockup-view-model h3, ytd-reel-item-renderer h3,
+  ytd-video-renderer h3, ytd-watch-metadata h1, yt-page-header-view-model h1, ytd-rich-shelf-renderer #title,
+  ytd-shelf-renderer #title, ytd-app h2) :not(.plakat-ov, .plakat-ov *, #movie_player *, .html5-video-player *) {
+  font-family: var(--plakat-title-font) !important;
+  font-weight: var(--plakat-title-weight) !important;
+  letter-spacing: -0.005em;
+}
+
+html.plakat-theme :is(yt-chip-cloud-chip-renderer, chip-shape, yt-tab-shape, tp-yt-paper-tab, ytd-guide-section-renderer h3):not(#movie_player *, .html5-video-player *),
+html.plakat-theme :is(yt-chip-cloud-chip-renderer, chip-shape, yt-tab-shape, tp-yt-paper-tab, ytd-guide-section-renderer h3) :not(.plakat-ov, .plakat-ov *) {
+  font-family: var(--plakat-label-font) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+html.plakat-theme :is(ytd-channel-name, yt-content-metadata-view-model, #metadata-line, ytd-video-owner-renderer, yt-button-shape,
+  ytd-button-renderer, ytd-guide-entry-renderer, ytd-watch-metadata #description, ytd-comments):not(#movie_player *, .html5-video-player *),
+html.plakat-theme :is(ytd-channel-name, yt-content-metadata-view-model, #metadata-line, ytd-video-owner-renderer, yt-button-shape,
+  ytd-button-renderer, ytd-guide-entry-renderer, ytd-watch-metadata #description, ytd-comments) :not(.plakat-ov, .plakat-ov *, #movie_player *, .html5-video-player *) {
+  font-family: var(--plakat-text-font) !important;
+}
+
+/* Posters have square corners; avatars stay round. */
+html.plakat-theme :is(ytd-thumbnail, ytd-thumbnail *, yt-thumbnail-view-model, yt-thumbnail-view-model *, ytm-shorts-lockup-view-model img,
+  .plakat-thumb, yt-chip-cloud-chip-renderer, chip-shape, chip-shape *, yt-button-shape button, ytd-button-renderer button,
+  ytd-searchbox *, yt-searchbox *, ytd-watch-metadata #description, tp-yt-iron-dropdown, ytd-menu-popup-renderer,
+  ytd-multi-page-menu-renderer, tp-yt-paper-dialog):not(#movie_player *, .html5-video-player *, .plakat-av) {
+  border-radius: 0 !important;
+}
+
+/* In 'channel' mode the page can take the poster's own background; a hairline keeps the edge. */
+html.plakat-theme .plakat-thumb { outline: 1px solid var(--yt-spec-10-percent-layer); outline-offset: -1px; }

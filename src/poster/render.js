@@ -20,16 +20,23 @@
     return p;
   };
 
+  const channelRng = ({ style, salt, channelKey }) => P.rng(`c|${channelKey}|${salt}|${style.id}`);
+
+  // The palette is always the channel RNG's first draw.
+  const paletteOf = (style, c) => {
+    const palettes = style.palettes && style.palettes.length ? style.palettes : P.BUILTIN_STYLES[0].palettes;
+    const raw = palettes[Math.floor(c() * palettes.length)];
+    return { bg: raw[0], fg: raw[1], a1: raw[2], a2: raw[3] ?? raw[1], a3: raw[4] ?? raw[2] };
+  };
+
   // Everything one channel's posters share. The channel RNG is consumed in a fixed
   // order, palette first and then engine.series(), so the avatar and every thumbnail
   // of a channel get the same palette and the same series traits.
   const seriesOf = ({ style, salt, channelKey }) => {
     const engine = engineOf(style);
     const p = paramsOf(engine, style);
-    const c = P.rng(`c|${channelKey}|${salt}|${style.id}`);
-    const palettes = style.palettes && style.palettes.length ? style.palettes : P.BUILTIN_STYLES[0].palettes;
-    const raw = palettes[Math.floor(c() * palettes.length)];
-    const pal = { bg: raw[0], fg: raw[1], a1: raw[2], a2: raw[3] ?? raw[1], a3: raw[4] ?? raw[2] };
+    const c = channelRng({ style, salt, channelKey });
+    const pal = paletteOf(style, c);
     const comp = (n) => (p.composition === 'auto' || p.composition == null
       ? Math.floor(c() * n)
       : Math.min(n - 1, Math.max(0, +p.composition)));
@@ -52,6 +59,11 @@
     xmlns: 'http://www.w3.org/2000/svg', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMid slice',
     width: '100%', height: '100%', class: cls, 'data-palette': [pal.bg, pal.fg, pal.a1, pal.a2, pal.a3].join(' '),
   }, h('rect', { x: 0, y: 0, width: W, height: H, fill: pal.bg }), body);
+
+  // The palette and title typeface of a channel's series, for theming the page around its
+  // posters. Reads the channel RNG on its own, so nothing a poster draws changes.
+  P.paletteFor = ({ style, salt = 0, channelKey }) => paletteOf(style, channelRng({ style, salt, channelKey }));
+  P.titleFontOf = (style) => paramsOf(engineOf(style), style).font;
 
   P.render = ({ style, salt = 0, title, channelName, channelKey, vid, thumbUrl, W = 480, H = 270 }) => {
     const s = seriesOf({ style, salt, channelKey });

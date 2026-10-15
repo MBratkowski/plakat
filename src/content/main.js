@@ -38,7 +38,11 @@
   };
   const scanners = [P.thumbnailPass, P.avatarPass].map(createScanner);
 
-  const scan = () => scanners.forEach((s) => s.scan());
+  // The theme follows the page's channel, which can change with any DOM update.
+  const scan = () => {
+    scanners.forEach((s) => s.scan());
+    P.theme.apply(env.settings);
+  };
   let scanTimer = 0;
   const scheduleScan = () => {
     scanTimer ||= setTimeout(() => {
@@ -57,6 +61,7 @@
     env.version++;
     P.overlay.clearCache();
     applyRootClasses();
+    P.theme.apply(env.settings);
     scanners.forEach((s) => s.rerender());
   };
 
@@ -93,6 +98,8 @@
       return;
     }
     applyRootClasses();
+    // Colours before the fonts arrive, so the page does not flash in YouTube's own theme for long.
+    P.theme.apply(env.settings);
     await P.loadFonts();
     started = true;
     new MutationObserver(scheduleScan).observe(document.documentElement, {
