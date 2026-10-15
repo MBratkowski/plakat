@@ -118,12 +118,52 @@ function shortCard(i) {
 }
 function searchCard(i) {
   const [ch, handle, title] = vids[i];
-  const id = vid(i) + 'S';
+  return resultCard(ch, handle, title, vid(i) + 'S');
+}
+function resultCard(ch, handle, title, id) {
   return make('ytd-video-renderer', `<ytd-thumbnail><a id="thumbnail" href="/watch?v=${id}&pp=abc"><yt-image><img class="thumb" src="${thumbSrc(id)}"></yt-image></a></ytd-thumbnail>
     <div><h3><a id="video-title" href="/watch?v=${id}" title="${title}">${title}</a></h3>
     <div id="channel-info"><a id="channel-thumbnail" href="/${handle}"><yt-img-shadow><img class="av s24" src="${avatarSrc(handle)}"></yt-img-shadow></a>
     <ytd-channel-name><a href="/${handle}">${ch}</a></ytd-channel-name></div></div>`);
 }
+// Search pages whose channels have a clear topic (dev/e2e.py topic checks). On
+// "kuchnia" a tech channel turns to cooking: its topic must stay tech.
+const results = {
+  programowanie: [
+    ['Linux od podstaw', '@linuxodpodstaw', 'Linux od podstaw: 10 komend terminala, które musisz znać'],
+    ['Kod i Kawa', '@kodikawa', 'Python w 10 minut: programowanie dla początkujących'],
+    ['Linux od podstaw', '@linuxodpodstaw', 'Docker i Kubernetes na Raspberry Pi | Homelab'],
+    ['Kod i Kawa', '@kodikawa', 'TypeScript i React: refaktoryzacja krok po kroku'],
+    ['Linux od podstaw', '@linuxodpodstaw', 'Ubuntu czy Debian na serwer? Porównanie 2026'],
+    ['Kod i Kawa', '@kodikawa', 'Algorytmy i struktury danych w JavaScript #4'],
+  ],
+  kuchnia: [
+    ['Kod i Kawa', '@kodikawa', 'Przepis na domowy ramen | Gotujemy'],
+    ['Kod i Kawa', '@kodikawa', 'Pierogi ruskie: przepis na ciasto'],
+    ['Kod i Kawa', '@kodikawa', 'Zupa pomidorowa: przepis na obiad'],
+    ['Kod i Kawa', '@kodikawa', 'Ciasto drożdżowe z piekarnika'],
+    ['Kod i Kawa', '@kodikawa', 'Pizza z piekarnika: gotujemy w domu'],
+    ['Kod i Kawa', '@kodikawa', 'Domowy ramen na kolację'],
+  ],
+};
+// Watch pages with the server-rendered meta tags YouTube puts in the document, an owner
+// and a related video of the same channel. Other watch ids show Android Developers.
+const watchPages = {
+  GAME0001: {
+    owner: ['Granie na Spokojnie', '@graniespokojnie'], title: 'Minecraft Hardcore #3: pierwsza noc',
+    keywords: 'minecraft, gameplay, lets play, survival', genre: 'Gaming',
+    related: 'Minecraft: budujemy zamek z subskrybentami',
+  },
+};
+// Channel pages' meta keywords; other channels have YouTube's generic ones.
+const channelKeywords = { '/@designtalks': 'design, typografia, plakat, bauhaus, graphic design' };
+const addMeta = (attrs) => {
+  const m = document.createElement('meta');
+  for (const [k, v] of Object.entries(attrs)) m.setAttribute(k, v);
+  document.head.appendChild(m);
+};
+const watch = location.pathname === '/watch' ? watchPages[new URLSearchParams(location.search).get('v')] : null;
+
 // The last entry is a subscription with no videos on the page.
 const guide = [...[0, 1, 4, 5].map((i) => vids[i]), ['Kanał Tylko w Menu', '@tylkowmenu']];
 function guideEntry([ch, handle]) {
@@ -143,9 +183,20 @@ for (let i = 0; i < 4; i++) document.getElementById('old').appendChild(oldCard(i
 for (let i = 4; i < 8; i++) document.getElementById('new').appendChild(newCard(i));
 for (let i = 0; i < 6; i++) document.getElementById('shorts').appendChild(shortCard(i));
 for (let i = 1; i < 3; i++) document.getElementById('search').appendChild(searchCard(i));
+const query = location.pathname === '/results' ? new URLSearchParams(location.search).get('search_query') : null;
+(results[query] || []).forEach(([ch, handle, title], i) => document.getElementById('search').appendChild(resultCard(ch, handle, title, `${query.slice(0, 4).toUpperCase()}${String(i).padStart(4, '0')}`)));
+if (watch) {
+  addMeta({ name: 'title', content: watch.title });
+  addMeta({ name: 'keywords', content: watch.keywords });
+  addMeta({ itemprop: 'genre', content: watch.genre });
+  document.getElementById('search').appendChild(resultCard(...watch.owner, watch.related, 'RELATED01'));
+} else {
+  addMeta({ name: 'keywords', content: channelKeywords[location.pathname] || 'video, sharing, camera phone, video phone, free, upload' });
+}
 for (const entry of guide) document.getElementById('guide').appendChild(guideEntry(entry));
-setHTML(document.getElementById('owner'), `<ytd-video-owner-renderer class="row"><a href="/@androiddevelopers"><yt-img-shadow id="avatar"><img class="av s40" src="${avatarSrc('@androiddevelopers')}"></yt-img-shadow></a>
-  <div id="upload-info"><ytd-channel-name><a href="/@androiddevelopers">Android Developers</a></ytd-channel-name><div class="meta">2,1 mln subskrypcji</div></div></ytd-video-owner-renderer>`);
+const [ownerName, ownerHandle] = watch ? watch.owner : ['Android Developers', '@androiddevelopers'];
+setHTML(document.getElementById('owner'), `<ytd-video-owner-renderer class="row"><a href="/${ownerHandle}"><yt-img-shadow id="avatar"><img class="av s40" src="${avatarSrc(ownerHandle)}"></yt-img-shadow></a>
+  <div id="upload-info"><ytd-channel-name><a href="/${ownerHandle}">${ownerName}</a></ytd-channel-name><div class="meta">2,1 mln subskrypcji</div></div></ytd-video-owner-renderer>`);
 const comments = document.getElementById('comments');
 comments.appendChild(make('ytd-comment-simplebox-renderer', `<div id="author-thumbnail"><yt-img-shadow><img class="av s40" src="https://yt3.ggpht.com/me=s88"></yt-img-shadow></div> Dodaj komentarz…`));
 comments.appendChild(make('ytd-comment-thread-renderer', '')).appendChild(comment('@ania.k', 'Świetny materiał, dzięki!', false));

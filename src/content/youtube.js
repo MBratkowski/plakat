@@ -177,8 +177,42 @@
     return { key, name: channelNameNear(link, key) || clean(img.getAttribute('alt')) };
   };
 
+  // ---------- Page metadata ----------
+  // Meta tags (title, keywords, category) are server-rendered for the page the document
+  // was loaded for. YouTube's SPA navigation leaves them in place, so they are read only
+  // while the URL still shows that page.
+  const pageId = () => {
+    const vid = location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null;
+    if (vid) return 'watch:' + vid;
+    const key = channelKeyFromPath(location.pathname);
+    return key ? 'channel:' + key : null;
+  };
+  const loadedPage = pageId();
+  const meta = (sel) => clean(document.querySelector(sel)?.getAttribute('content'));
+  // What YouTube puts in meta keywords on pages that have none of their own.
+  const GENERIC_KEYWORDS = 'video, sharing, camera phone, video phone, free, upload';
+
+  // Topic hints of the loaded watch or channel page: { id, channel, item?, keywords? }.
+  // null on other pages, after navigating away, and until the watch page shows its owner.
+  const pageHints = () => {
+    const id = pageId();
+    if (!id || id !== loadedPage) return null;
+    let keywords = meta('meta[name="keywords"]');
+    if (keywords === GENERIC_KEYWORDS) keywords = '';
+    if (id.startsWith('channel:')) return keywords ? { id, channel: { key: id.slice(8), name: '' }, keywords } : null;
+    const owner = document.querySelector(SEL.owner);
+    const channel = owner && channelFromLinks(owner);
+    const title = meta('meta[name="title"]') || meta('meta[property="og:title"]');
+    if (!channel || !title) return null;
+    const item = { vid: id.slice(6), title };
+    if (keywords) item.tags = keywords;
+    const genre = meta('meta[itemprop="genre"]');
+    if (genre) item.genre = genre;
+    return { id, channel, item };
+  };
+
   P.yt = {
-    SEL, clean, vidFromHref, channelKeyFromPath, findCard, findTitle, findChannel, avatarChannel,
+    SEL, clean, vidFromHref, channelKeyFromPath, findCard, findTitle, findChannel, avatarChannel, pageHints,
     thumbUrl: (img) => imageUrl(img, THUMB_URL),
     avatarUrl: (img) => imageUrl(img, AVATAR_URL),
   };

@@ -28,6 +28,7 @@ Plakat replaces the thumbnails on YouTube with generative posters in five design
 - **Reads the title.** Strips emoji and hashtags, splits "Title | subtitle", pulls out episode numbers (`#12`, `odc. 47`, `ep 5`) and the strongest word, and sets type to fit.
 - **Stays out of the way.** Hover shows the original, Alt+Shift+P toggles everything, YouTube's duration and progress badges stay on top.
 - **Yours to edit.** Pin a style per channel, reroll a series, or build your own style in the editor and share it as JSON.
+- **Style by topic (opt-in).** Plakat recognises a channel's topic (tech, reviews, music, gaming, cooking, sport, design) from its titles and from the keywords and category of its watch and channel pages, and can draw its style from that topic's pool: tech channels get Terminal and Kod. A topic, once recognised, stays, and channels without one keep their look.
 
 ## Styles
 
@@ -46,7 +47,7 @@ Plakat replaces the thumbnails on YouTube with generative posters in five design
 **Ma 間** · emptiness, a single circle, a serif title, a hairline. Avatar: one circle off centre and a small initial.
 <img src="docs/images/style-ma.png" alt="Ma style: three posters, a Short and the channel avatar at three sizes" width="100%">
 
-**Tech styles (opt-in prototypes)** · **Terminal**: a CRT console where a command built from the title prints the title, with scrollback, scanlines and a phosphor cursor; the avatar is the initials and a cursor block. **Kod**: a code editor where the title becomes a function in the channel's language (JS, Python, Rust or Lisp), the episode number is the highlighted line and the full title is the returned string; the avatar is the initials in that language's brackets. Both use JetBrains Mono and stay out of the default pool, so turn them on under **Style** in the options.
+**Tech styles (opt-in prototypes)** · **Terminal**: a CRT console where a command built from the title prints the title, with scrollback, scanlines and a phosphor cursor; the avatar is the initials and a cursor block. **Kod**: a code editor where the title becomes a function in the channel's language (JS, Python, Rust or Lisp), the episode number is the highlighted line and the full title is the returned string; the avatar is the initials in that language's brackets. Both use JetBrains Mono and stay out of the default pool, so turn them on under **Style** in the options, or turn on style by topic under **Tematy** to give them to tech channels only.
 
 ## Install
 
@@ -68,6 +69,7 @@ The interface is in Polish.
 | **Ogólne** | on/off, hover reveal, channel avatars, avatars in comments |
 | **Kanały** | every channel you have seen, with its avatar and three posters on its real titles; pin a style or reroll the series |
 | **Style** | choose which styles take part in the draw, duplicate one to edit it, import and export JSON |
+| **Tematy** | turn on style by topic and choose which styles each topic draws from (an empty pool uses the normal one); every channel row shows its detected topic |
 | **Editor** | engine, typeface, case, composition, channel name, numbers, duotone photo, density and palettes, previewed on a channel's recent videos and its avatar at 96, 40 and 24 px |
 
 <p align="center">
@@ -89,7 +91,8 @@ flowchart LR
   series --> avatar
 ```
 
-- **Seeds.** `rng("c|channel|salt|style")` picks the palette and feeds the engine's `series()`. `rng("v|video|salt|style")` drives each video's variant and `rng("a|channel|salt|style")` the avatar's. A channel without a pinned style gets one from the pool through `rng("pool|channel|salt")`. Thumbnails and avatars run the same `series()`, which is why they always match.
+- **Seeds.** `rng("c|channel|salt|style")` picks the palette and feeds the engine's `series()`. `rng("v|video|salt|style")` drives each video's variant and `rng("a|channel|salt|style")` the avatar's. A channel without a pinned style gets one from the pool through `rng("pool|channel|salt")`; with style by topic on, a channel with a topic draws from its topic's pool with the same seed. Thumbnails and avatars run the same `series()`, which is why they always match.
+- **Topics.** `src/core/topics.js` holds the keyword table and scores a channel's titles, name, page keywords and category; a topic is given only when one clearly leads. It is stored once in `topics` in `chrome.storage.local` and never recomputed, so more titles cannot change a channel's look. Meta tags are read only on the page the document was loaded for, because YouTube's SPA navigation leaves them stale. No extra requests.
 - **Rendering.** Engines return a virtual SVG tree (`h(tag, attrs, ...children)`), which the content script builds with `createElementNS`. YouTube enforces Trusted Types, so there is no `innerHTML` anywhere.
 - **YouTube's DOM.** Selectors follow links, ids and custom element names, never class names, which YouTube renames often. Thumbnails are any `/watch?v=` or `/shorts/` link around an `<img>`; avatars are keyed by the nearest `/@handle` or `/channel/…` link. Overlays sit right after the original image and carry a signature that catches recycled elements; an `IntersectionObserver` per pass and a render cache keep scrolling smooth.
 
@@ -98,10 +101,10 @@ flowchart LR
 Classic scripts sharing `globalThis.Plakat`, no bundler. The load order in `manifest.json` is also the dependency order, and each layer only uses the ones before it.
 
 ```
-src/core/       primitives: seeded RNG, virtual SVG, colour, typography, title analysis, i18n
+src/core/       primitives: seeded RNG, virtual SVG, colour, typography, title analysis, channel topics, i18n
 src/engines/    the five style engines and their shared kit
 src/poster/     built-in styles and the render pipeline (P.render, P.renderAvatar)
-src/store/      settings and seen channels in chrome.storage.local
+src/store/      settings, seen channels and their topics in chrome.storage.local
 src/content/    YouTube adapter: selectors, overlays, thumbnail and avatar passes
 options/        options page and style editor
 popup/          toolbar popup
@@ -128,7 +131,7 @@ Then add the file to `manifest.json`, `options/options.html`, `popup/popup.html`
 
 - **Website.** `docs/index.html` is the landing page that GitHub Pages serves at [mbratkowski.github.io/plakat](https://mbratkowski.github.io/plakat/). Its images and self-hosted fonts live in `docs/assets/`; the README images live in `docs/images/`.
 - **Gallery.** Open `dev/gallery.html?style=<id>` from disk to see every variant of a style, with each channel's avatar under its poster and at 96, 40 and 24 px. Add `&salt=<n>` to shift all seeds.
-- **End-to-end tests.** `python3 dev/e2e.py [editor]` launches Chromium with the extension against `dev/mock-youtube.html`: old and new YouTube DOM, Shorts, search, the player, the watch page owner, guide subscriptions, comments, the channel header, element recycling, late hydration and Trusted Types. It prints one line per assertion and saves screenshots to `$TMPDIR/plakat-e2e/`. Needs `pip install playwright && playwright install chromium`.
+- **End-to-end tests.** `python3 dev/e2e.py [editor]` launches Chromium with the extension against `dev/mock-youtube.html`: old and new YouTube DOM, Shorts, search, the player, the watch page owner, guide subscriptions, comments, the channel header, element recycling, late hydration and Trusted Types, plus search and watch pages for topic detection (style by topic off and on, sticky topics, page meta tags). It prints one line per assertion and saves screenshots to `$TMPDIR/plakat-e2e/`. Needs `pip install playwright && playwright install chromium`.
 
 ## Publishing
 

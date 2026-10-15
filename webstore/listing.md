@@ -82,7 +82,7 @@ HOW TO USE
 The settings page is in Polish for now.
 
 PRIVACY
-Plakat runs entirely in your browser. It has no servers, no analytics and no account, and it sends nothing. It stores your settings and a list of channels you have seen, used to preview them in the settings, on your device. One button clears the list.
+Plakat runs entirely in your browser. It has no servers, no analytics and no account, and it sends nothing. It stores your settings and a list of channels you have seen on your device, used to preview them in the settings and to recognise each channel's topic. One button clears the list.
 Privacy policy: https://mbratkowski.github.io/plakat/privacy.html
 
 Plakat is not affiliated with YouTube or Google.
@@ -102,13 +102,13 @@ Plakat restyles YouTube: it draws generative posters over video thumbnails and c
 `storage`:
 
 ```text
-Stores the user's settings (on/off switches, the styles in the draw, custom styles, per-channel choices) and a local list of channels the user has seen on YouTube (channel handle and name, IDs and titles of up to 12 recent videos, avatar image URL), so the settings page can preview each channel's posters on its real titles. Nothing is transmitted.
+Stores the user's settings (on/off switches, the styles in the draw, custom styles, per-channel choices, style by topic and the styles each topic draws from), a local list of channels the user has seen on YouTube (channel handle and name, IDs and titles of up to 12 recent videos, avatar image URL; for channel and video pages the user opens, the page's keywords, tags and category) and the topic recognised for each channel, so the settings page can preview each channel's posters on its real titles and, when the user turns it on, a channel's style can follow its topic. Nothing is transmitted.
 ```
 
 Host permission (the content script on `https://www.youtube.com/*`):
 
 ```text
-The content script runs only on https://www.youtube.com/* to read video titles, channel names and image URLs on the page and to draw the poster overlays there. It does not run on any other site and makes no network requests of its own.
+The content script runs only on https://www.youtube.com/* to read video titles, channel names, image URLs and, on watch and channel pages, the page's meta keywords and category, and to draw the poster overlays there. It does not run on any other site and makes no network requests of its own.
 ```
 
 ### Remote code
@@ -117,9 +117,9 @@ Select **No, I am not using remote code**. All JavaScript, CSS and fonts ship in
 
 ### Data usage
 
-Plakat reads video titles and channel names from YouTube pages and keeps some of them on the device. Nothing leaves the browser, but the honest, low-risk choice is to declare it:
+Plakat reads video titles, channel names and page keywords and categories from YouTube pages and keeps some of them on the device. Nothing leaves the browser, but the honest, low-risk choice is to declare it:
 
-- Tick **Website content** (titles and channel names read from YouTube pages, stored locally).
+- Tick **Website content** (titles, channel names, page keywords and categories read from YouTube pages, stored locally).
 - Leave every other category unticked.
 - Tick all three certifications: the data is not sold or transferred to third parties outside the approved use cases, not used for purposes unrelated to the single purpose, and not used to determine creditworthiness or for lending.
 

@@ -39,7 +39,7 @@
       // No channel at all (e.g. the Shorts shelf): one series per video, not one for everything.
       if (ch.key === '_') ch.key = 'vid:' + vid;
       const portrait = rect.width / rect.height < 0.8;
-      const { style, salt } = P.resolveStyle(settings, ch.key);
+      const { style, salt } = P.resolveStyle(settings, ch.key, env.topics[ch.key]);
       const sig = `${env.version}|${vid}|${ch.key}|${style.id}|${salt}|${portrait ? 'p' : 'l'}|${title}`;
       const current = P.overlay.find(host, CLS);
       if (current && current.dataset.sig === sig) return;

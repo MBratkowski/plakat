@@ -30,6 +30,12 @@
   "switchCommentAvatarsHint": {
     "message": "Autorzy komentarzy to zwykle ludzie, nie kanały, więc domyślnie zostają oryginalne"
   },
+  "switchByTopic": {
+    "message": "Styl według tematu kanału"
+  },
+  "switchByTopicHint": {
+    "message": "Kanał z rozpoznanym tematem losuje styl z puli tego tematu. Kanały bez tematu wyglądają tak jak dotąd."
+  },
   "popupTagline": {
     "message": "miniatury jak plakaty"
   },
@@ -81,6 +87,9 @@
   "sectionStyles": {
     "message": "Style"
   },
+  "sectionTopics": {
+    "message": "Tematy"
+  },
   "channelSearchPlaceholder": {
     "message": "Szukaj kanału…"
   },
@@ -91,7 +100,7 @@
     "message": "Kanały pojawiają się tu same, kiedy przeglądasz YouTube. „Losowy” bierze styl z puli na podstawie seedu kanału. Wybór konkretnego stylu przypina go na stałe."
   },
   "channelsDataNote": {
-    "message": "Ta lista powstaje tylko w Twojej przeglądarce: Plakat zapisuje nazwy kanałów, tytuły ostatnio widzianych filmów i adresy awatarów, żeby pokazać tu podgląd. Nic nie jest wysyłane na zewnątrz."
+    "message": "Ta lista powstaje tylko w Twojej przeglądarce: Plakat zapisuje nazwy kanałów, tytuły ostatnio widzianych filmów i adresy awatarów, a ze stron filmów i kanałów, które otworzysz, także słowa kluczowe i kategorię. Służą do podglądu i do rozpoznania tematu kanału. Nic nie jest wysyłane na zewnątrz."
   },
   "privacyPolicy": {
     "message": "Polityka prywatności"
@@ -150,6 +159,22 @@
   },
   "channelOwnStyle": {
     "message": "Własny styl dla kanału…"
+  },
+  "channelTopic": {
+    "message": "Temat: $TOPIC$",
+    "placeholders": {
+      "topic": {
+        "content": "$1",
+        "example": "Technologia"
+      }
+    }
+  },
+  "channelTopicUnknown": {
+    "message": "Temat: jeszcze nierozpoznany"
+  },
+  "channelTopicPool": {
+    "message": "styl z puli tematu",
+    "description": "Shown next to the channel's topic when its style comes from the topic's pool."
   },
   "stylesLede": {
     "message": "Zaznaczone style trafiają do puli losowania. Własny styl zrobisz, duplikując wbudowany: zmienisz w nim palety, krój, kompozycję i dodatki."
@@ -242,6 +267,56 @@
   "styleCardChannel3": {
     "message": "Android Dev",
     "description": "Sample channel name on the style card previews."
+  },
+  "topicsLede": {
+    "message": "Plakat rozpoznaje temat kanału po tytułach filmów, nazwie kanału oraz słowach kluczowych i kategorii ze strony filmu albo kanału. Rozpoznany temat zostaje na stałe, więc kanał nie zmienia wyglądu, gdy przybywa filmów. Temat z pustą pulą losuje ze zwykłej puli."
+  },
+  "topicChannels": {
+    "message": "kanałów: $COUNT$",
+    "description": "Number of listed channels with this topic.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "topicPoolLabel": {
+    "message": "Pula tematu $TOPIC$",
+    "placeholders": {
+      "topic": {
+        "content": "$1",
+        "example": "Technologia"
+      }
+    }
+  },
+  "topicPoolEmpty": {
+    "message": "pusta: losuje ze zwykłej puli"
+  },
+  "topicTech": {
+    "message": "Technologia"
+  },
+  "topicReviews": {
+    "message": "Recenzje"
+  },
+  "topicMusic": {
+    "message": "Muzyka"
+  },
+  "topicGaming": {
+    "message": "Gry"
+  },
+  "topicCooking": {
+    "message": "Gotowanie"
+  },
+  "topicSport": {
+    "message": "Sport"
+  },
+  "topicDesign": {
+    "message": "Design"
+  },
+  "topicOther": {
+    "message": "Inne",
+    "description": "Topic of channels whose titles match no other topic."
   },
   "sampleTitle1": {
     "message": "Dlaczego plakaty szwajcarskie wciąż wygrywają",

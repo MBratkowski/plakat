@@ -24,6 +24,7 @@
         "src/core/color.js",
         "src/core/typography.js",
         "src/core/text.js",
+        "src/core/topics.js",
         "src/engines/kit.js",
         "src/engines/swiss.js",
         "src/engines/bauhaus.js",

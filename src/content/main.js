@@ -5,7 +5,8 @@
   if (!P || window.top !== window) return;
 
   // Shared by the passes. `version` invalidates every overlay signature at once.
-  const env = { settings: null, version: 0, names: new Map() };
+  // `topics` is the stored channel -> topic map (src/store/seen.js).
+  const env = { settings: null, topics: {}, version: 0, names: new Map() };
   let started = false;
 
   // Each pass gets its own IntersectionObserver, so only elements near the viewport render.
@@ -38,7 +39,20 @@
   };
   const scanners = [P.thumbnailPass, P.avatarPass].map(createScanner);
 
-  const scan = () => scanners.forEach((s) => s.scan());
+  // The loaded watch or channel page tells the channel's topic once per page.
+  let hintedPage = null;
+  const recordPageHints = () => {
+    if (!env.settings?.enabled) return;
+    const hints = P.yt.pageHints();
+    if (!hints || hints.id === hintedPage) return;
+    hintedPage = hints.id;
+    P.seenRecorder.page(hints);
+  };
+
+  const scan = () => {
+    scanners.forEach((s) => s.scan());
+    recordPageHints();
+  };
   let scanTimer = 0;
   const scheduleScan = () => {
     scanTimer ||= setTimeout(() => {
@@ -52,6 +66,9 @@
     root.classList.toggle('plakat-off', !env.settings?.enabled);
     root.classList.toggle('plakat-hover', !!env.settings?.hoverReveal);
   };
+
+  // Re-runs the passes on visible elements; only overlays whose signature changed are rebuilt.
+  const refresh = () => scanners.forEach((s) => s.rerender());
 
   const rerenderAll = () => {
     env.version++;
@@ -89,6 +106,7 @@
   const start = async () => {
     try {
       env.settings = await P.loadSettings();
+      env.topics = await P.loadTopics();
     } catch {
       return;
     }
@@ -108,9 +126,12 @@
   };
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local' || !changes.settings || !started) return;
-    env.settings = P.normalizeSettings(changes.settings.newValue);
-    rerenderAll();
+    if (area !== 'local' || !started) return;
+    if (changes.topics) env.topics = changes.topics.newValue || {};
+    if (changes.settings) {
+      env.settings = P.normalizeSettings(changes.settings.newValue);
+      rerenderAll();
+    } else if (changes.topics && env.settings.byTopic) refresh();
   });
 
   start();
