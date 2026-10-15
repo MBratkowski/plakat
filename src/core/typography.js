@@ -7,6 +7,7 @@
     Jost: { css: '"Plakat Jost", Futura, "Century Gothic", sans-serif', weights: [400, 500, 700] },
     Oswald: { css: '"Plakat Oswald", "Arial Narrow", Impact, sans-serif', weights: [400, 700] },
     'Cormorant Garamond': { css: '"Plakat Cormorant Garamond", Garamond, Georgia, serif', weights: [500, 600] },
+    'JetBrains Mono': { css: '"Plakat JetBrains Mono", "SF Mono", Menlo, Consolas, monospace', weights: [400, 700, 800] },
   };
   P.fontCss = (name) => (P.FONTS[name] || P.FONTS['Inter Tight']).css;
 

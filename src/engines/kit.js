@@ -15,15 +15,16 @@
   const P = (globalThis.Plakat ??= {});
   const { h } = P;
 
-  const TRACK = { 'Inter Tight': -0.035, Jost: -0.015, Oswald: 0.005, 'Cormorant Garamond': -0.005 };
+  const TRACK = { 'Inter Tight': -0.035, Jost: -0.015, Oswald: 0.005, 'Cormorant Garamond': -0.005, 'JetBrains Mono': 0 };
   const WEIGHTS = {
     'Inter Tight': { r: 400, b: 700, k: 900 },
     Jost: { r: 400, b: 500, k: 700 },
     Oswald: { r: 400, b: 700, k: 700 },
     'Cormorant Garamond': { r: 500, b: 600, k: 600 },
+    'JetBrains Mono': { r: 400, b: 700, k: 800 },
   };
   // Cap height as a fraction of the font size, measured on the bundled faces.
-  const CAP = { 'Inter Tight': 0.73, Jost: 0.7, Oswald: 0.81, 'Cormorant Garamond': 0.63 };
+  const CAP = { 'Inter Tight': 0.73, Jost: 0.7, Oswald: 0.81, 'Cormorant Garamond': 0.63, 'JetBrains Mono': 0.73 };
   const FONT_OPTIONS = Object.keys(WEIGHTS);
 
   // Saturate to grey, then map shadows to `dark` and highlights to `light`.

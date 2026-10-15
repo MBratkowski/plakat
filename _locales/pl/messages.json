@@ -1,183 +1,503 @@
 {
-  "extName": { "message": "Plakat — miniatury jak plakaty" },
-  "extDescription": { "message": "Zamienia miniatury i awatary kanałów na YouTube w generatywne plakaty: szwajcarskie, Bauhaus, konstruktywizm, jazz, minimalizm. Styl dobierany per kanał." },
-
-  "switchEnabled": { "message": "Włączone na YouTube" },
-  "switchEnabledHint": { "message": "Skrót na stronie:", "description": "Followed by the Alt+Shift+P keys." },
-  "switchHoverReveal": { "message": "Najechanie pokazuje oryginał" },
-  "switchHoverRevealHint": { "message": "Plakat znika po najechaniu kursorem na miniaturę albo awatar" },
-  "switchAvatars": { "message": "Awatary kanałów" },
-  "switchAvatarsHint": { "message": "Awatar w tej samej serii co miniatury kanału: przy filmach, w wynikach, w subskrypcjach i na stronie kanału" },
-  "switchCommentAvatars": { "message": "Awatary w komentarzach" },
-  "switchCommentAvatarsHint": { "message": "Autorzy komentarzy to zwykle ludzie, nie kanały, więc domyślnie zostają oryginalne" },
-
-  "popupTagline": { "message": "miniatury jak plakaty" },
-  "popupShortcutHint": { "message": "przełącza na stronie", "description": "Follows the Alt+Shift+P keys." },
-  "popupOpenOptions": { "message": "Style i kanały →" },
-  "popupSampleTitle1": { "message": "Dlaczego plakaty szwajcarskie wciąż wygrywają", "description": "Sample video title for the popup preview." },
-  "popupSampleTitle2": { "message": "Homelab odc. 12 — serwer za 500 zł", "description": "Sample video title for the popup preview." },
-  "popupSampleTitle3": { "message": "Kotlin Coroutines w praktyce", "description": "Sample video title for the popup preview." },
-  "popupSampleChannel": { "message": "Twój ulubiony kanał", "description": "Sample channel name for the popup preview." },
-
-  "toastOn": { "message": "Plakat: włączony" },
-  "toastOff": { "message": "Plakat: oryginalne miniatury" },
-
-  "optionsTitle": { "message": "Plakat — style i kanały" },
-  "optionsLede": { "message": "Miniatury YouTube jako plakaty. Każdy kanał dostaje własną serię: ten sam styl i paletę, inny wariant dla każdego filmu." },
-  "optionsHeroTitle": { "message": "Plakat — każdy kanał to seria", "description": "Video title drawn on the posters in the page header." },
-  "sectionGeneral": { "message": "Ogólne" },
-  "sectionChannels": { "message": "Kanały" },
-  "sectionStyles": { "message": "Style" },
-
-  "channelSearchPlaceholder": { "message": "Szukaj kanału…" },
-  "channelSearchLabel": { "message": "Szukaj kanału" },
-  "channelsLede": { "message": "Kanały pojawiają się tu same, kiedy przeglądasz YouTube. „Losowy” bierze styl z puli na podstawie seedu kanału. Wybór konkretnego stylu przypina go na stałe." },
-  "channelsEmpty": { "message": "Jeszcze pusto" },
-  "channelsEmptyHint": { "message": "Otwórz YouTube i przewiń stronę główną. Kanały pojawią się tu same." },
-  "channelsNoMatch": { "message": "Brak kanałów pasujących do wyszukiwania" },
+  "extName": {
+    "message": "Plakat — miniatury jak plakaty"
+  },
+  "extDescription": {
+    "message": "Zamienia miniatury i awatary kanałów na YouTube w generatywne plakaty: szwajcarskie, Bauhaus, konstruktywizm, jazz, minimalizm. Styl dobierany per kanał."
+  },
+  "switchEnabled": {
+    "message": "Włączone na YouTube"
+  },
+  "switchEnabledHint": {
+    "message": "Skrót na stronie:",
+    "description": "Followed by the Alt+Shift+P keys."
+  },
+  "switchHoverReveal": {
+    "message": "Najechanie pokazuje oryginał"
+  },
+  "switchHoverRevealHint": {
+    "message": "Plakat znika po najechaniu kursorem na miniaturę albo awatar"
+  },
+  "switchAvatars": {
+    "message": "Awatary kanałów"
+  },
+  "switchAvatarsHint": {
+    "message": "Awatar w tej samej serii co miniatury kanału: przy filmach, w wynikach, w subskrypcjach i na stronie kanału"
+  },
+  "switchCommentAvatars": {
+    "message": "Awatary w komentarzach"
+  },
+  "switchCommentAvatarsHint": {
+    "message": "Autorzy komentarzy to zwykle ludzie, nie kanały, więc domyślnie zostają oryginalne"
+  },
+  "popupTagline": {
+    "message": "miniatury jak plakaty"
+  },
+  "popupShortcutHint": {
+    "message": "przełącza na stronie",
+    "description": "Follows the Alt+Shift+P keys."
+  },
+  "popupOpenOptions": {
+    "message": "Style i kanały →"
+  },
+  "popupSampleTitle1": {
+    "message": "Dlaczego plakaty szwajcarskie wciąż wygrywają",
+    "description": "Sample video title for the popup preview."
+  },
+  "popupSampleTitle2": {
+    "message": "Homelab odc. 12 — serwer za 500 zł",
+    "description": "Sample video title for the popup preview."
+  },
+  "popupSampleTitle3": {
+    "message": "Kotlin Coroutines w praktyce",
+    "description": "Sample video title for the popup preview."
+  },
+  "popupSampleChannel": {
+    "message": "Twój ulubiony kanał",
+    "description": "Sample channel name for the popup preview."
+  },
+  "toastOn": {
+    "message": "Plakat: włączony"
+  },
+  "toastOff": {
+    "message": "Plakat: oryginalne miniatury"
+  },
+  "optionsTitle": {
+    "message": "Plakat — style i kanały"
+  },
+  "optionsLede": {
+    "message": "Miniatury YouTube jako plakaty. Każdy kanał dostaje własną serię: ten sam styl i paletę, inny wariant dla każdego filmu."
+  },
+  "optionsHeroTitle": {
+    "message": "Plakat — każdy kanał to seria",
+    "description": "Video title drawn on the posters in the page header."
+  },
+  "sectionGeneral": {
+    "message": "Ogólne"
+  },
+  "sectionChannels": {
+    "message": "Kanały"
+  },
+  "sectionStyles": {
+    "message": "Style"
+  },
+  "channelSearchPlaceholder": {
+    "message": "Szukaj kanału…"
+  },
+  "channelSearchLabel": {
+    "message": "Szukaj kanału"
+  },
+  "channelsLede": {
+    "message": "Kanały pojawiają się tu same, kiedy przeglądasz YouTube. „Losowy” bierze styl z puli na podstawie seedu kanału. Wybór konkretnego stylu przypina go na stałe."
+  },
+  "channelsEmpty": {
+    "message": "Jeszcze pusto"
+  },
+  "channelsEmptyHint": {
+    "message": "Otwórz YouTube i przewiń stronę główną. Kanały pojawią się tu same."
+  },
+  "channelsNoMatch": {
+    "message": "Brak kanałów pasujących do wyszukiwania"
+  },
   "channelsShowMore": {
     "message": "Pokaż więcej ($COUNT$)",
-    "placeholders": { "count": { "content": "$1", "example": "12" } }
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
   },
   "channelStyleLabel": {
     "message": "Styl dla $CHANNEL$",
-    "placeholders": { "channel": { "content": "$1", "example": "Kanał Techniczny" } }
+    "placeholders": {
+      "channel": {
+        "content": "$1",
+        "example": "Kanał Techniczny"
+      }
+    }
   },
   "channelRandomStyle": {
     "message": "Losowy (teraz: $STYLE$)",
     "description": "Style picker option that leaves the style to the channel seed.",
-    "placeholders": { "style": { "content": "$1", "example": "Bauhaus" } }
+    "placeholders": {
+      "style": {
+        "content": "$1",
+        "example": "Bauhaus"
+      }
+    }
   },
-  "channelPinned": { "message": "przypięty" },
-  "channelNoLink": { "message": "kanał bez linku" },
-  "channelReroll": { "message": "Przelosuj" },
-  "channelRerollHint": { "message": "Nowa paleta i kompozycja (a w trybie losowym także nowy styl)" },
-  "channelOwnStyle": { "message": "Własny styl dla kanału…" },
-
-  "stylesLede": { "message": "Zaznaczone style trafiają do puli losowania. Własny styl zrobisz, duplikując wbudowany: zmienisz w nim palety, krój, kompozycję i dodatki." },
-  "stylesImport": { "message": "Importuj JSON" },
+  "channelPinned": {
+    "message": "przypięty"
+  },
+  "channelNoLink": {
+    "message": "kanał bez linku"
+  },
+  "channelReroll": {
+    "message": "Przelosuj"
+  },
+  "channelRerollHint": {
+    "message": "Nowa paleta i kompozycja (a w trybie losowym także nowy styl)"
+  },
+  "channelOwnStyle": {
+    "message": "Własny styl dla kanału…"
+  },
+  "stylesLede": {
+    "message": "Zaznaczone style trafiają do puli losowania. Własny styl zrobisz, duplikując wbudowany: zmienisz w nim palety, krój, kompozycję i dodatki."
+  },
+  "stylesImport": {
+    "message": "Importuj JSON"
+  },
   "stylesImportError": {
     "message": "Błąd: $ERROR$",
-    "placeholders": { "error": { "content": "$1", "example": "Nieznany silnik: foo" } }
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Nieznany silnik: foo"
+      }
+    }
   },
-  "styleKindBuiltin": { "message": "wbudowany" },
-  "styleKindCustom": { "message": "własny" },
+  "styleKindBuiltin": {
+    "message": "wbudowany"
+  },
+  "styleKindCustom": {
+    "message": "własny"
+  },
   "styleMeta": {
     "message": "$KIND$ · $ENGINE$ · $COUNT$ pal.",
     "description": "Style card subtitle: kind, engine and number of palettes.",
     "placeholders": {
-      "kind": { "content": "$1", "example": "wbudowany" },
-      "engine": { "content": "$2", "example": "Bauhaus" },
-      "count": { "content": "$3", "example": "4" }
+      "kind": {
+        "content": "$1",
+        "example": "wbudowany"
+      },
+      "engine": {
+        "content": "$2",
+        "example": "Bauhaus"
+      },
+      "count": {
+        "content": "$3",
+        "example": "4"
+      }
     }
   },
-  "stylePool": { "message": "w puli" },
-  "stylePoolHint": { "message": "Uwzględniaj w losowaniu dla kanałów bez przypiętego stylu" },
-  "styleDuplicateEdit": { "message": "Duplikuj i edytuj" },
-  "styleEdit": { "message": "Edytuj" },
-  "styleDuplicate": { "message": "Duplikuj" },
-  "styleExport": { "message": "Eksport" },
-  "styleDelete": { "message": "Usuń" },
-  "confirmSure": { "message": "Na pewno?" },
+  "stylePool": {
+    "message": "w puli"
+  },
+  "stylePoolHint": {
+    "message": "Uwzględniaj w losowaniu dla kanałów bez przypiętego stylu"
+  },
+  "styleDuplicateEdit": {
+    "message": "Duplikuj i edytuj"
+  },
+  "styleEdit": {
+    "message": "Edytuj"
+  },
+  "styleDuplicate": {
+    "message": "Duplikuj"
+  },
+  "styleExport": {
+    "message": "Eksport"
+  },
+  "styleDelete": {
+    "message": "Usuń"
+  },
+  "confirmSure": {
+    "message": "Na pewno?"
+  },
   "styleCopyName": {
     "message": "$STYLE$ — mój",
     "description": "Name of a new style duplicated from another one.",
-    "placeholders": { "style": { "content": "$1", "example": "Bauhaus" } }
+    "placeholders": {
+      "style": {
+        "content": "$1",
+        "example": "Bauhaus"
+      }
+    }
   },
-  "styleUntitled": { "message": "Bez nazwy" },
-  "styleFileFallback": { "message": "styl", "description": "Exported file name stem when the style name has no letters." },
-  "styleCardChannel1": { "message": "Kanał o designie", "description": "Sample channel name on the style card previews." },
-  "styleCardChannel2": { "message": "Homelab PL", "description": "Sample channel name on the style card previews." },
-  "styleCardChannel3": { "message": "Android Dev", "description": "Sample channel name on the style card previews." },
-
-  "sampleTitle1": { "message": "Dlaczego plakaty szwajcarskie wciąż wygrywają", "description": "Sample video title for previews of channels with few recorded videos." },
-  "sampleTitle2": { "message": "Homelab odc. 12 — serwer domowy za 500 zł", "description": "Sample video title for previews." },
-  "sampleTitle3": { "message": "Kotlin Coroutines: Structured Concurrency", "description": "Sample video title for previews." },
-  "sampleTitle4": { "message": "10 miejsc we Wrocławiu, które musisz zobaczyć", "description": "Sample video title for previews." },
-  "sampleTitle5": { "message": "Jak zacząć biegać i nie odpuścić po tygodniu", "description": "Sample video title for previews." },
-  "sampleTitle6": { "message": "Wywiad: o projektowaniu krojów pisma", "description": "Sample video title for previews." },
-
-  "editorNameLabel": { "message": "Nazwa stylu" },
-  "editorEngine": { "message": "Silnik" },
-  "editorPalettes": { "message": "Palety" },
-  "editorRandomPalette": { "message": "Losuj paletę" },
-  "editorCopyPalette": { "message": "+ kopia" },
-  "editorPalettesHint": { "message": "Tło · tekst · akcent 1 · akcent 2 · akcent 3. Kanał dostaje jedną paletę na stałe (z seedu)." },
-  "editorPreviewOn": { "message": "Podgląd na" },
-  "editorSampleTitles": { "message": "Przykładowe tytuły" },
-  "editorSampleChannel": { "message": "Twój kanał", "description": "Channel name in the preview on sample titles." },
+  "styleUntitled": {
+    "message": "Bez nazwy"
+  },
+  "styleFileFallback": {
+    "message": "styl",
+    "description": "Exported file name stem when the style name has no letters."
+  },
+  "styleCardChannel1": {
+    "message": "Kanał o designie",
+    "description": "Sample channel name on the style card previews."
+  },
+  "styleCardChannel2": {
+    "message": "Homelab PL",
+    "description": "Sample channel name on the style card previews."
+  },
+  "styleCardChannel3": {
+    "message": "Android Dev",
+    "description": "Sample channel name on the style card previews."
+  },
+  "sampleTitle1": {
+    "message": "Dlaczego plakaty szwajcarskie wciąż wygrywają",
+    "description": "Sample video title for previews of channels with few recorded videos."
+  },
+  "sampleTitle2": {
+    "message": "Homelab odc. 12 — serwer domowy za 500 zł",
+    "description": "Sample video title for previews."
+  },
+  "sampleTitle3": {
+    "message": "Kotlin Coroutines: Structured Concurrency",
+    "description": "Sample video title for previews."
+  },
+  "sampleTitle4": {
+    "message": "10 miejsc we Wrocławiu, które musisz zobaczyć",
+    "description": "Sample video title for previews."
+  },
+  "sampleTitle5": {
+    "message": "Jak zacząć biegać i nie odpuścić po tygodniu",
+    "description": "Sample video title for previews."
+  },
+  "sampleTitle6": {
+    "message": "Wywiad: o projektowaniu krojów pisma",
+    "description": "Sample video title for previews."
+  },
+  "editorNameLabel": {
+    "message": "Nazwa stylu"
+  },
+  "editorEngine": {
+    "message": "Silnik"
+  },
+  "editorPalettes": {
+    "message": "Palety"
+  },
+  "editorRandomPalette": {
+    "message": "Losuj paletę"
+  },
+  "editorCopyPalette": {
+    "message": "+ kopia"
+  },
+  "editorPalettesHint": {
+    "message": "Tło · tekst · akcent 1 · akcent 2 · akcent 3. Kanał dostaje jedną paletę na stałe (z seedu)."
+  },
+  "editorPreviewOn": {
+    "message": "Podgląd na"
+  },
+  "editorSampleTitles": {
+    "message": "Przykładowe tytuły"
+  },
+  "editorSampleChannel": {
+    "message": "Twój kanał",
+    "description": "Channel name in the preview on sample titles."
+  },
   "editorSourceNote": {
     "message": "$COUNT$ ostatnich filmów z tego kanału",
-    "placeholders": { "count": { "content": "$1", "example": "12" } }
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
   },
   "editorAvatarCaption": {
     "message": "Awatar kanału $CHANNEL$",
-    "placeholders": { "channel": { "content": "$1", "example": "Kanał Techniczny" } }
+    "placeholders": {
+      "channel": {
+        "content": "$1",
+        "example": "Kanał Techniczny"
+      }
+    }
   },
-  "editorAllPalettes": { "message": "Wszystkie palety na jednym tytule" },
-  "editorExport": { "message": "Eksportuj JSON" },
-  "editorCancel": { "message": "Anuluj" },
-  "editorSaveAssign": { "message": "Zapisz i użyj dla kanału" },
+  "editorAllPalettes": {
+    "message": "Wszystkie palety na jednym tytule"
+  },
+  "editorExport": {
+    "message": "Eksportuj JSON"
+  },
+  "editorCancel": {
+    "message": "Anuluj"
+  },
+  "editorSaveAssign": {
+    "message": "Zapisz i użyj dla kanału"
+  },
   "editorSaveAssignTo": {
     "message": "Zapisz i użyj dla: $CHANNEL$",
-    "placeholders": { "channel": { "content": "$1", "example": "Kanał Techniczny" } }
+    "placeholders": {
+      "channel": {
+        "content": "$1",
+        "example": "Kanał Techniczny"
+      }
+    }
   },
-  "editorSave": { "message": "Zapisz styl" },
-  "paletteBackground": { "message": "Tło" },
-  "paletteText": { "message": "Tekst" },
-  "paletteAccent1": { "message": "Akcent 1" },
-  "paletteAccent2": { "message": "Akcent 2" },
-  "paletteAccent3": { "message": "Akcent 3" },
+  "editorSave": {
+    "message": "Zapisz styl"
+  },
+  "paletteBackground": {
+    "message": "Tło"
+  },
+  "paletteText": {
+    "message": "Tekst"
+  },
+  "paletteAccent1": {
+    "message": "Akcent 1"
+  },
+  "paletteAccent2": {
+    "message": "Akcent 2"
+  },
+  "paletteAccent3": {
+    "message": "Akcent 3"
+  },
   "paletteColorLabel": {
     "message": "$SLOT$, paleta $INDEX$",
     "placeholders": {
-      "slot": { "content": "$1", "example": "Tło" },
-      "index": { "content": "$2", "example": "2" }
+      "slot": {
+        "content": "$1",
+        "example": "Tło"
+      },
+      "index": {
+        "content": "$2",
+        "example": "2"
+      }
     }
   },
-  "paletteRemove": { "message": "Usuń paletę" },
-
-  "paramFont": { "message": "Krój tytułu" },
-  "paramCase": { "message": "Wielkość liter" },
-  "caseAsIs": { "message": "Jak w tytule" },
-  "caseLower": { "message": "małe" },
-  "caseUpper": { "message": "WIELKIE" },
-  "paramComposition": { "message": "Kompozycja" },
-  "compositionAuto": { "message": "Losowa per kanał" },
-  "paramShowChannel": { "message": "Nazwa kanału" },
-  "paramShowNumber": { "message": "Liczby z tytułu" },
-  "paramPhoto": { "message": "Zdjęcie z miniatury (duoton)" },
-  "paramDensity": { "message": "Gęstość form" },
-
-  "engineSwiss": { "message": "Szwajcarski" },
-  "swissCompNumber": { "message": "Liczba / koło" },
-  "swissCompRings": { "message": "Pierścienie" },
-  "swissCompWord": { "message": "Wielkie słowo" },
-  "engineBauhaus": { "message": "Bauhaus" },
-  "bauhausCompRight": { "message": "Formy z prawej / u góry" },
-  "bauhausCompLeft": { "message": "Formy z lewej / u dołu" },
-  "engineKonstrukt": { "message": "Konstruktywizm" },
-  "konstruktCompCircle": { "message": "Czerwone koło" },
-  "konstruktCompWedge": { "message": "Czerwony klin" },
-  "engineJazz": { "message": "Jazz '60" },
-  "jazzCompLeft": { "message": "Zdjęcie z lewej" },
-  "jazzCompTop": { "message": "Zdjęcie u góry" },
-  "engineMa": { "message": "Ma 間" },
-  "maCompSun": { "message": "Słońce" },
-  "maCompEnso": { "message": "Ensō" },
-  "maCompHorizon": { "message": "Horyzont" },
-
-  "builtinSwiss": { "message": "Szwajcarski" },
-  "builtinBauhaus": { "message": "Bauhaus" },
-  "builtinKonstrukt": { "message": "Konstruktywizm" },
-  "builtinJazz": { "message": "Jazz '60" },
-  "builtinMa": { "message": "Ma 間" },
-
-  "importNotStyle": { "message": "To nie jest obiekt stylu" },
+  "paletteRemove": {
+    "message": "Usuń paletę"
+  },
+  "paramFont": {
+    "message": "Krój tytułu"
+  },
+  "paramCase": {
+    "message": "Wielkość liter"
+  },
+  "caseAsIs": {
+    "message": "Jak w tytule"
+  },
+  "caseLower": {
+    "message": "małe"
+  },
+  "caseUpper": {
+    "message": "WIELKIE"
+  },
+  "paramComposition": {
+    "message": "Kompozycja"
+  },
+  "compositionAuto": {
+    "message": "Losowa per kanał"
+  },
+  "paramShowChannel": {
+    "message": "Nazwa kanału"
+  },
+  "paramShowNumber": {
+    "message": "Liczby z tytułu"
+  },
+  "paramPhoto": {
+    "message": "Zdjęcie z miniatury (duoton)"
+  },
+  "paramDensity": {
+    "message": "Gęstość form"
+  },
+  "engineSwiss": {
+    "message": "Szwajcarski"
+  },
+  "swissCompNumber": {
+    "message": "Liczba / koło"
+  },
+  "swissCompRings": {
+    "message": "Pierścienie"
+  },
+  "swissCompWord": {
+    "message": "Wielkie słowo"
+  },
+  "engineBauhaus": {
+    "message": "Bauhaus"
+  },
+  "bauhausCompRight": {
+    "message": "Formy z prawej / u góry"
+  },
+  "bauhausCompLeft": {
+    "message": "Formy z lewej / u dołu"
+  },
+  "engineKonstrukt": {
+    "message": "Konstruktywizm"
+  },
+  "konstruktCompCircle": {
+    "message": "Czerwone koło"
+  },
+  "konstruktCompWedge": {
+    "message": "Czerwony klin"
+  },
+  "engineJazz": {
+    "message": "Jazz '60"
+  },
+  "jazzCompLeft": {
+    "message": "Zdjęcie z lewej"
+  },
+  "jazzCompTop": {
+    "message": "Zdjęcie u góry"
+  },
+  "engineMa": {
+    "message": "Ma 間"
+  },
+  "engineTerminal": {
+    "message": "Terminal"
+  },
+  "terminalCompWindow": {
+    "message": "Okno"
+  },
+  "terminalCompFull": {
+    "message": "Pełny ekran"
+  },
+  "engineKod": {
+    "message": "Kod"
+  },
+  "kodCompEditor": {
+    "message": "Edytor"
+  },
+  "kodCompZoom": {
+    "message": "Zbliżenie"
+  },
+  "maCompSun": {
+    "message": "Słońce"
+  },
+  "maCompEnso": {
+    "message": "Ensō"
+  },
+  "maCompHorizon": {
+    "message": "Horyzont"
+  },
+  "builtinSwiss": {
+    "message": "Szwajcarski"
+  },
+  "builtinBauhaus": {
+    "message": "Bauhaus"
+  },
+  "builtinKonstrukt": {
+    "message": "Konstruktywizm"
+  },
+  "builtinJazz": {
+    "message": "Jazz '60"
+  },
+  "builtinMa": {
+    "message": "Ma 間"
+  },
+  "builtinTerminal": {
+    "message": "Terminal"
+  },
+  "builtinKod": {
+    "message": "Kod"
+  },
+  "importNotStyle": {
+    "message": "To nie jest obiekt stylu"
+  },
   "importUnknownEngine": {
     "message": "Nieznany silnik: $ENGINE$",
-    "placeholders": { "engine": { "content": "$1", "example": "foo" } }
+    "placeholders": {
+      "engine": {
+        "content": "$1",
+        "example": "foo"
+      }
+    }
   },
-  "importNoPalette": { "message": "Styl musi mieć co najmniej jedną paletę (#rrggbb)" },
-  "importDefaultName": { "message": "Mój styl" }
+  "importNoPalette": {
+    "message": "Styl musi mieć co najmniej jedną paletę (#rrggbb)"
+  },
+  "importDefaultName": {
+    "message": "Mój styl"
+  }
 }

@@ -69,5 +69,31 @@
     return [...out].slice(0, max).join('').toLocaleUpperCase('pl');
   };
 
+  // ---------- Titles as code ----------
+  // Tokens of a title: { s, kind: 'word' | 'num' | 'sym', stop }. Used by the code-flavoured
+  // engines to build identifiers, flags and arguments from real title words.
+  P.tokenize = (t) => (String(t || '').match(/\p{L}[\p{L}\p{N}'’]*|\p{N}+(?:[.,]\p{N}+)*|\S/gu) || []).map((s) => ({
+    s,
+    kind: /^\p{L}/u.test(s) ? 'word' : /^\p{N}/u.test(s) ? 'num' : 'sym',
+    stop: STOP.has(s.toLowerCase()),
+  }));
+
+  // "Zażółć" -> "Zazolc": strips diacritics, including ł, which NFD does not decompose.
+  P.asciiFold = (s) => String(s).normalize('NFD').replace(/\p{M}/gu, '').replace(/ł/g, 'l').replace(/Ł/g, 'L');
+
+  // Words joined as an identifier: 'snake' (home_server), 'camel' (homeServer),
+  // 'kebab' (home-server). ASCII only, so it reads as code in any language.
+  P.identifier = (words, style = 'snake') => {
+    const parts = words.map((w) => P.asciiFold(w).toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
+    if (!parts.length) return '';
+    if (style === 'camel') return parts[0] + parts.slice(1).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+    return parts.join(style === 'kebab' ? '-' : '_');
+  };
+
+  // Identifier from the first `max` meaningful words of a title, e.g.
+  // "Jak zbudowałem własny serwer" -> "zbudowalem_wlasny".
+  P.titleIdentifier = (title, style, max = 2) =>
+    P.identifier(P.tokenize(title).filter((t) => t.kind === 'word' && !t.stop).slice(0, max).map((t) => t.s), style);
+
   P.pad = (n, len = 3) => String(n).padStart(len, '0');
 })();

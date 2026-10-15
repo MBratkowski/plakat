@@ -46,6 +46,8 @@ Plakat replaces the thumbnails on YouTube with generative posters in five design
 **Ma 間** · emptiness, a single circle, a serif title, a hairline. Avatar: one circle off centre and a small initial.
 <img src="docs/images/style-ma.png" alt="Ma style: three posters, a Short and the channel avatar at three sizes" width="100%">
 
+**Tech styles (opt-in prototypes)** · **Terminal**: a CRT console where a command built from the title prints the title, with scrollback, scanlines and a phosphor cursor; the avatar is the initials and a cursor block. **Kod**: a code editor where the title becomes a function in the channel's language (JS, Python, Rust or Lisp), the episode number is the highlighted line and the full title is the returned string; the avatar is the initials in that language's brackets. Both use JetBrains Mono and stay out of the default pool, so turn them on under **Style** in the options.
+
 ## Install
 
 Plakat is not in the Chrome Web Store yet. Load it unpacked:
