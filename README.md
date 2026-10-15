@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  Chrome extension · Manifest V3 · no build step · no external services · deterministic
+  <a href="https://mbratkowski.github.io/plakat/"><b>Website</b></a> · Chrome extension · Manifest V3 · no build step · no external services · deterministic
 </p>
 
 ---
@@ -124,6 +124,7 @@ Then add the file to `manifest.json`, `options/options.html`, `popup/popup.html`
 
 ## Development
 
+- **Website.** `docs/index.html` is the landing page that GitHub Pages serves at [mbratkowski.github.io/plakat](https://mbratkowski.github.io/plakat/). Its images and self-hosted fonts live in `docs/assets/`; the README images live in `docs/images/`.
 - **Gallery.** Open `dev/gallery.html?style=<id>` from disk to see every variant of a style, with each channel's avatar under its poster and at 96, 40 and 24 px. Add `&salt=<n>` to shift all seeds.
 - **End-to-end tests.** `python3 dev/e2e.py [editor]` launches Chromium with the extension against `dev/mock-youtube.html`: old and new YouTube DOM, Shorts, search, the player, the watch page owner, guide subscriptions, comments, the channel header, element recycling, late hydration and Trusted Types. It prints one line per assertion and saves screenshots to `$TMPDIR/plakat-e2e/`. Needs `pip install playwright && playwright install chromium`.
 

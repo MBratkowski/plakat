@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plakat — your YouTube feed, redrawn as posters</title>
+<meta name="description" content="A Chrome extension that turns every YouTube thumbnail and channel avatar into a generative poster. Each channel gets its own series: Swiss, Bauhaus, Constructivist, '60s jazz or Ma.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Plakat — your YouTube feed, redrawn as posters">
+<meta property="og:description" content="Every YouTube thumbnail and channel avatar as a generative poster. Every channel becomes a series.">
+<meta property="og:url" content="https://mbratkowski.github.io/plakat/">
+<meta property="og:image" content="https://mbratkowski.github.io/plakat/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f1ede4">
+<link rel="icon" href="assets/icon32.png">
+<link rel="apple-touch-icon" href="assets/icon128.png">
+<style>
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-900-normal.woff2) format("woff2");font-weight:900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter Tight";src:url(assets/fonts/inter-tight-latin-ext-900-normal.woff2) format("woff2");font-weight:900;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Oswald";src:url(assets/fonts/oswald-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Oswald";src:url(assets/fonts/oswald-latin-ext-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Oswald";src:url(assets/fonts/oswald-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Oswald";src:url(assets/fonts/oswald-latin-ext-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+:root {
+  --paper: #f1ede4; --paper-2: #e7e1d4; --ink: #111111; --muted: #5f5a52; --body: #3d3a35; --line: #cfc7b6;
+  --red: #e5322d; --red-text: #c8201e; --blue: #1f4fd8; --yellow: #f2b705;
+  --shadow: 0 2px 4px rgba(20, 16, 10, 0.1), 0 16px 36px rgba(20, 16, 10, 0.16);
+  --gutter: clamp(20px, 4vw, 48px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.5 "Inter Tight", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; height: auto; }
+[hidden] { display: none !important; }
+a { color: var(--ink); }
+a:hover { color: var(--red-text); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+h1, h2, h3, p { margin: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: var(--gutter); }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.mark { position: relative; width: 34px; height: 34px; border-radius: 7px; background: var(--paper-2); overflow: hidden; }
+.mark::before { content: ""; position: absolute; right: 4px; top: 4px; width: 19px; height: 19px; border-radius: 50%; background: var(--red); }
+.mark::after { content: ""; position: absolute; left: 5px; right: 5px; bottom: 5px; height: 4px; background: var(--ink); }
+.wordmark { font-weight: 900; font-size: 26px; letter-spacing: -0.05em; }
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font-size: 16px; font-weight: 700; }
+.nav a { text-decoration: none; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 14px 26px; border-radius: 999px; border: 2px solid var(--ink); font-family: inherit; font-weight: 700; font-size: 17px; line-height: 1; text-decoration: none; cursor: pointer; transition: background 0.12s, color 0.12s; }
+.btn.small { min-height: 44px; padding: 10px 18px; font-size: 16px; }
+.btn.dark { background: var(--ink); color: var(--paper); }
+.btn.dark:hover { background: var(--red-text); border-color: var(--red-text); color: #fff; }
+.btn.line { background: transparent; color: var(--ink); }
+.btn.line:hover { background: var(--ink); color: var(--paper); }
+.btn svg { flex: none; }
+
+/* Hero */
+.meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); font-size: 14px; font-weight: 700; }
+.meta span + span { font-weight: 400; }
+.hero { display: flex; flex-wrap: wrap; align-items: center; gap: 40px; padding: 48px 0 72px; }
+.hero-copy { flex: 1 1 540px; min-width: 0; }
+.hero h1 { margin: 0 0 32px -0.04em; font-weight: 900; font-size: clamp(60px, 8.4vw, 132px); line-height: 0.88; letter-spacing: -0.06em; }
+.hero h1 em { font-style: normal; color: var(--red); }
+.lede { max-width: 540px; margin-bottom: 32px; font-size: 20px; line-height: 1.45; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+.fine { font-size: 15px; color: var(--muted); }
+.hero-art { flex: 1 1 460px; min-width: 0; position: relative; }
+.hero-art::before { content: ""; position: absolute; width: 74%; aspect-ratio: 1; border-radius: 50%; background: var(--blue); right: -4%; top: 2%; }
+.hero-art img { position: relative; width: 100%; }
+
+/* Style band */
+.band-wrap { overflow: hidden; padding-block: 24px; }
+.band { margin: 0 -40px; transform: rotate(-2.2deg); background: var(--ink); color: var(--paper); padding: 18px 0 18px 40px; white-space: nowrap; overflow: hidden; font: 700 30px/1.2 "Oswald", "Arial Narrow", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+.band i { font-style: normal; color: var(--red); padding-inline: 0.35em; }
+.band i.y { color: var(--yellow); } .band i.b { color: #8fc1e3; }
+
+/* Sections */
+.sec { padding-top: 110px; }
+.kicker { margin-bottom: 12px; font: 400 15px/1.2 "Oswald", sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red-text); }
+.sec h2 { max-width: 900px; margin-bottom: 20px; font-weight: 700; font-size: clamp(40px, 5vw, 68px); line-height: 1; letter-spacing: -0.045em; }
+.sec-lede { max-width: 720px; color: var(--body); }
+.row-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+
+/* Off / on */
+.segmented { display: flex; gap: 4px; padding: 5px; border: 2px solid var(--ink); border-radius: 999px; }
+.segmented button { min-height: 44px; padding: 10px 20px; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; cursor: pointer; }
+.segmented button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.segmented button[data-power="on"][aria-pressed="true"] { background: var(--red-text); color: #fff; }
+.screen { background: #0f0f0f; border-radius: 20px; padding: clamp(12px, 2vw, 28px); }
+
+/* Styles */
+.tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 40px; }
+.tabs button { min-height: 48px; padding: 12px 22px; border: 2px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font-family: inherit; font-weight: 700; font-size: 16px; line-height: 1; cursor: pointer; }
+.tabs button:hover { background: var(--paper-2); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.style { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; padding-top: 40px; border-top: 2px solid var(--ink); }
+.style-text { flex: 1 1 340px; min-width: 0; max-width: 440px; }
+.style-native { margin-bottom: 6px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.style-text h3 { margin-bottom: 18px; font-weight: 900; font-size: clamp(44px, 5vw, 72px); line-height: 0.92; letter-spacing: -0.055em; }
+.style-text > p { margin-bottom: 28px; }
+.facts { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 14px 16px; margin: 0; padding-top: 18px; border-top: 1px solid var(--line); font-size: 16px; }
+.facts dt { font-weight: 700; }
+.facts dd { margin: 0; }
+.swatches { display: flex; gap: 6px; margin-bottom: 6px; }
+.swatches span { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.25); }
+.palette-note { font-size: 14px; color: var(--muted); }
+.style-art { flex: 999 1 560px; min-width: 0; display: flex; gap: 16px; align-items: flex-start; }
+.style-main { flex: 3 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.style-main > img, .style-row > img, .style-short { border-radius: 14px; box-shadow: var(--shadow); }
+.style-row { display: flex; gap: 16px; align-items: flex-start; }
+.style-row > img { flex: 1 1 0; min-width: 0; border-radius: 12px; }
+.channel { flex: none; width: 120px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 6px; font-size: 13px; font-weight: 700; line-height: 1.3; text-align: center; }
+.channel img, .avatars img { border-radius: 50%; box-shadow: 0 0 0 4px var(--paper), 0 10px 24px rgba(20, 16, 10, 0.2); }
+.style-short { flex: 1 1 0; min-width: 0; max-width: 240px; border-radius: 12px; }
+
+/* How it works */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 48px; border-top: 2px solid var(--ink); }
+.step { padding: 28px 28px 32px 0; border-bottom: 1px solid var(--line); }
+.step-num { margin-bottom: 18px; font: 700 84px/0.9 "Oswald", sans-serif; }
+.step h3 { margin-bottom: 10px; font-size: 24px; letter-spacing: -0.02em; }
+.step p { color: var(--body); }
+.series { display: flex; flex-wrap: wrap; align-items: center; gap: 28px 40px; padding: 40px 0 8px; }
+.avatars { display: flex; flex-wrap: wrap; gap: 14px; }
+.series p { flex: 1 1 320px; font-size: 16px; color: var(--body); }
+.specs { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); border: 2px solid var(--ink); border-radius: 16px; overflow: hidden; }
+.specs li { padding: 22px 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; }
+.specs b { display: block; font-size: 20px; letter-spacing: -0.02em; }
+.specs span { font-size: 15px; color: var(--muted); }
+
+/* Make it yours */
+.yours { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; padding-bottom: 120px; }
+.yours-text { flex: 1 1 360px; min-width: 0; max-width: 460px; }
+.yours-text h2 { font-size: clamp(40px, 5vw, 64px); }
+.bullets { list-style: none; margin: 4px 0 20px; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.bullets li { display: flex; gap: 14px; }
+.bullets li::before { content: ""; flex: none; width: 12px; height: 12px; margin-top: 8px; background: var(--red); }
+.bullets li:nth-child(2)::before { border-radius: 50%; background: var(--blue); }
+.bullets li:nth-child(3)::before { width: 0; height: 0; margin-top: 6px; background: none; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 13px solid var(--yellow); }
+.bullets li:nth-child(4)::before { background: none; border: 2.5px solid var(--ink); border-radius: 50%; }
+.yours-art { flex: 999 1 560px; min-width: 0; }
+.yours-art img { border-radius: 16px; border: 1px solid #d9d3c5; box-shadow: 0 2px 4px rgba(20, 16, 10, 0.08), 0 24px 48px rgba(20, 16, 10, 0.14); }
+
+/* Install */
+.install { position: relative; overflow: hidden; background: var(--ink); color: var(--paper); }
+.install::before { content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%; background: var(--red); right: -140px; top: -160px; }
+.install::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; border: 22px solid var(--yellow); right: 300px; bottom: -70px; }
+.install .wrap { position: relative; z-index: 1; padding-block: 110px 120px; }
+.install .kicker { color: #ff6b5e; }
+.install h2 { max-width: 760px; margin-bottom: 44px; font-weight: 900; font-size: clamp(48px, 7vw, 108px); line-height: 0.9; letter-spacing: -0.055em; }
+.install ol { list-style: none; margin: 0 0 40px; padding: 0; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; counter-reset: step; }
+.install li { padding-top: 16px; border-top: 2px solid var(--paper); counter-increment: step; }
+.install li::before { content: "Step " counter(step); display: block; margin-bottom: 8px; font: 700 15px/1.2 "Oswald", sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
+.install code { font: 15px/1.4 ui-monospace, "SF Mono", Menlo, monospace; }
+.clone { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.clone code { max-width: 100%; padding: 14px 18px; overflow-x: auto; white-space: nowrap; background: #1f1f1e; border: 1px solid #3a3936; border-radius: 10px; }
+.btn.paper { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.btn.paper:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.install .fine { margin-top: 22px; color: #b9b3a7; }
+
+/* Footer */
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px 40px; padding-block: 40px 56px; font-size: 14px; color: var(--muted); }
+.foot .wordmark { display: block; margin-bottom: 6px; font-size: 22px; color: var(--ink); }
+.foot p + p { margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .band { font-size: 22px; }
+  .style-art { flex-wrap: wrap; }
+  .style-main { flex: 1 1 100%; }
+  .style-short { flex: 0 0 auto; width: 48%; }
+  .channel { width: 104px; }
+  .facts { grid-template-columns: 90px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="#top" aria-label="Plakat, back to top"><span class="mark" aria-hidden="true"></span><span class="wordmark">Plakat</span></a>
+  <nav class="nav" aria-label="Main">
+    <a href="#styles">Styles</a>
+    <a href="#how">How it works</a>
+    <a href="#install">Install</a>
+    <a class="btn line small" href="https://github.com/MBratkowski/plakat">GitHub</a>
+  </nav>
+</header>
+
+<main id="top">
+<section class="wrap">
+  <div class="meta"><span>Plakat — a Chrome extension for YouTube</span><span>Nº 001 · free on GitHub</span></div>
+  <div class="hero">
+    <div class="hero-copy">
+      <h1>your feed,<br>redrawn as<br><em>posters.</em></h1>
+      <p class="lede">Plakat turns every YouTube thumbnail and channel avatar into a generative poster. Each channel gets its own series — Swiss, Bauhaus, Constructivist, ’60s jazz or Ma 間 — and every video is a new variant of it.</p>
+      <div class="actions">
+        <a class="btn dark" href="https://github.com/MBratkowski/plakat">Get it on GitHub
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn line" href="#styles">See the five styles</a>
+      </div>
+      <p class="fine">Runs entirely in your browser. No account, no tracking.</p>
+    </div>
+    <div class="hero-art">
+      <img src="assets/collage.png" width="1880" height="1520" alt="A collage of generated posters: a Swiss poster with a giant red 5, a Constructivist Short reading Every channel is a series, a Ma poster with a single red circle, and two round channel avatars">
+    </div>
+  </div>
+</section>
+
+<div class="band-wrap" aria-hidden="true"><div class="band">Swiss<i>■</i>Bauhaus<i class="y">■</i>Constructivism<i>■</i>Jazz ’60<i class="b">■</i>Ma 間<i>■</i>Swiss<i>■</i>Bauhaus<i class="y">■</i>Constructivism<i>■</i>Jazz ’60<i class="b">■</i>Ma 間<i>■</i>Swiss</div></div>
+
+<section class="wrap sec" aria-labelledby="flip-title">
+  <div class="row-head">
+    <div>
+      <p class="kicker">01 — Flip the switch</p>
+      <h2 id="flip-title">Same feed. A different wall.</h2>
+      <p class="sec-lede">Press Alt+Shift+P on YouTube to switch between the originals and the posters. Hover any poster or avatar to peek at what is underneath.</p>
+    </div>
+    <div class="segmented" role="group" aria-label="Plakat on YouTube">
+      <button type="button" data-power="off" aria-pressed="false">Plakat off</button>
+      <button type="button" data-power="on" aria-pressed="true">Plakat on</button>
+    </div>
+  </div>
+  <div class="screen">
+    <img data-shot="on" src="assets/on.png" width="2528" height="536" alt="A YouTube feed with Plakat on: four videos as posters in Ma, Constructivist, Jazz and Swiss styles, each with a matching channel avatar">
+    <img data-shot="off" src="assets/off.png" width="2528" height="536" alt="The same YouTube feed with Plakat off: the original thumbnails and avatars" hidden>
+  </div>
+</section>
+
+<section id="styles" class="wrap sec" aria-labelledby="styles-title">
+  <p class="kicker">02 — Five styles</p>
+  <h2 id="styles-title">Five design traditions. Each channel gets one.</h2>
+  <div class="tabs" role="group" aria-label="Choose a style">
+    <button type="button" data-style="swiss" aria-pressed="true">Swiss</button>
+    <button type="button" data-style="bauhaus" aria-pressed="false">Bauhaus</button>
+    <button type="button" data-style="konstrukt" aria-pressed="false">Constructivism</button>
+    <button type="button" data-style="jazz" aria-pressed="false">Jazz ’60</button>
+    <button type="button" data-style="ma" aria-pressed="false">Ma 間</button>
+  </div>
+  <div class="style" aria-live="polite">
+    <div class="style-text">
+      <p class="style-native" data-f="native">Szwajcarski</p>
+      <h3 data-f="name">Swiss</h3>
+      <p data-f="blurb">A grid, grotesque type and one loud gesture: a giant episode number, a circle or concentric rings. Titles run lowercase and flush left under a hairline with the channel and a serial number.</p>
+      <dl class="facts">
+        <dt>Avatar</dt><dd data-f="avatarNote">A monogram beside a quarter circle in the channel’s accent.</dd>
+        <dt>Typeface</dt><dd data-f="type">Inter Tight</dd>
+        <dt>Palette</dt><dd><div class="swatches" data-f="swatches"><span style="background:#f1ede4" title="#f1ede4"></span><span style="background:#111111" title="#111111"></span><span style="background:#1f4fd8" title="#1f4fd8"></span><span style="background:#f2b705" title="#f2b705"></span></div><span class="palette-note" data-f="paletteNote">One of six palettes, fixed for this channel.</span></dd>
+      </dl>
+    </div>
+    <div class="style-art">
+      <div class="style-main">
+        <img data-img="poster1" src="assets/poster-swiss-1.png" width="1200" height="675" alt="Swiss poster for a video by Design Talks">
+        <div class="style-row">
+          <img data-img="poster2" src="assets/poster-swiss-2.png" width="1200" height="675" alt="A second Swiss poster from the same channel, a variant of the same series">
+          <div class="channel">
+            <img data-img="avatar" src="assets/avatar-swiss.png" width="96" height="96" alt="Design Talks avatar in the Swiss style">
+            <span data-f="channel">Design Talks</span>
+          </div>
+        </div>
+      </div>
+      <img class="style-short" data-img="short" src="assets/short-swiss.png" width="675" height="1200" alt="Swiss poster for a Short by Design Talks">
+    </div>
+  </div>
+</section>
+
+<section id="how" class="wrap sec" aria-labelledby="how-title">
+  <p class="kicker">03 — How it works</p>
+  <h2 id="how-title">Seeded, so a channel always looks like itself.</h2>
+  <div class="steps">
+    <div class="step">
+      <p class="step-num" aria-hidden="true" style="color: var(--red)">01</p>
+      <h3>The channel picks the series</h3>
+      <p>A random generator seeded with the channel chooses the style, the palette and the traits of the series: the layout, a vocabulary of shapes, a tilt.</p>
+    </div>
+    <div class="step">
+      <p class="step-num" aria-hidden="true" style="color: var(--blue)">02</p>
+      <h3>Every video is a variant</h3>
+      <p>A second generator, seeded with the video, moves and sizes things. The title is read too: episode numbers become giant numerals, the strongest word becomes the headline.</p>
+    </div>
+    <div class="step">
+      <p class="step-num" aria-hidden="true">03</p>
+      <h3>The avatar joins the series</h3>
+      <p>Avatars next to videos, in search, in your subscriptions, on the watch page and in channel headers share the channel’s palette and forms. Comment authors keep their faces.</p>
+    </div>
+  </div>
+  <div class="series">
+    <div class="avatars">
+      <img src="assets/avatar-swiss.png" width="72" height="72" alt="Design Talks avatar, Swiss style">
+      <img src="assets/avatar-bauhaus.png" width="72" height="72" alt="Kanał Techniczny avatar, Bauhaus style">
+      <img src="assets/avatar-konstrukt.png" width="72" height="72" alt="Rozmowy o biznesie avatar, Constructivist style">
+      <img src="assets/avatar-jazz.png" width="72" height="72" alt="Blue Note Hour avatar, Jazz style">
+      <img src="assets/avatar-ma.png" width="72" height="72" alt="Slow Kyoto avatar, Ma style">
+    </div>
+    <p>Five channels, five series. The circle beside a title always matches the poster above it.</p>
+  </div>
+  <ul class="specs">
+    <li><b>Manifest V3</b><span>Plain scripts, no bundler, no build step.</span></li>
+    <li><b>Trusted Types–safe</b><span>Every poster is built with createElementNS. No innerHTML.</span></li>
+    <li><b>Deterministic</b><span>Same channel, same series, on every visit and every device.</span></li>
+    <li><b>Light on the page</b><span>Only what is near the viewport renders, and renders are cached.</span></li>
+  </ul>
+</section>
+
+<section class="wrap sec" aria-labelledby="yours-title">
+  <div class="yours">
+    <div class="yours-text">
+      <p class="kicker">04 — Make it yours</p>
+      <h2 id="yours-title">Pin it, reroll it, or design your own.</h2>
+      <ul class="bullets">
+        <li>Pin a style to any channel you have seen.</li>
+        <li>Reroll a channel for a new palette and composition.</li>
+        <li>Build your own style: engine, typeface, case, composition, density and palettes, previewed on the channel’s real titles.</li>
+        <li>Share styles as JSON.</li>
+      </ul>
+      <p class="fine">The settings are in Polish for now.</p>
+    </div>
+    <div class="yours-art">
+      <img src="assets/options.png" width="2416" height="1098" loading="lazy" alt="The Plakat options page: each channel you have seen, with its avatar, three posters on its real titles, a style picker and a reroll button">
+    </div>
+  </div>
+</section>
+
+<section id="install" class="install" aria-labelledby="install-title">
+  <div class="wrap">
+    <p class="kicker">05 — Install</p>
+    <h2 id="install-title">hang the posters in a minute.</h2>
+    <ol>
+      <li>Clone or download the repository from GitHub.</li>
+      <li>Open <code>chrome://extensions</code> and turn on Developer mode.</li>
+      <li>Click Load unpacked and pick the folder with <code>manifest.json</code>.</li>
+      <li>Open YouTube. Alt+Shift+P toggles the posters.</li>
+    </ol>
+    <div class="clone">
+      <code>git clone https://github.com/MBratkowski/plakat.git</code>
+      <a class="btn paper" href="https://github.com/MBratkowski/plakat">Open on GitHub
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <p class="fine">Not in the Chrome Web Store yet.</p>
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <div>
+    <span class="wordmark">Plakat</span>
+    <p>By <a href="https://github.com/MBratkowski">@MBratkowski</a> · <a href="https://github.com/MBratkowski/plakat">Source on GitHub</a></p>
+  </div>
+  <div>
+    <p>Typefaces: Inter Tight, Jost, Oswald and Cormorant Garamond, under the <a href="assets/fonts/OFL.txt">SIL Open Font License</a>.</p>
+    <p>Not affiliated with YouTube or Google.</p>
+  </div>
+</footer>
+
+<script>
+// Off / on switch and the style picker. Without JS the page shows "on" and the Swiss style.
+(() => {
+  const STYLES = {
+    swiss: {
+      name: 'Swiss', native: 'Szwajcarski', channel: 'Design Talks', type: 'Inter Tight',
+      blurb: 'A grid, grotesque type and one loud gesture: a giant episode number, a circle or concentric rings. Titles run lowercase and flush left under a hairline with the channel and a serial number.',
+      avatarNote: 'A monogram beside a quarter circle in the channel’s accent.',
+      palette: ['#f1ede4', '#111111', '#1f4fd8', '#f2b705'], paletteNote: 'One of six palettes, fixed for this channel.',
+    },
+    bauhaus: {
+      name: 'Bauhaus', native: 'Bauhaus', channel: 'Kanał Techniczny', type: 'Jost',
+      blurb: 'A grid of primitives in primary colours: squares, half circles, quarters, rings and stripes. Each channel draws from its own four-shape vocabulary, and an episode number gets a cell of its own.',
+      avatarNote: 'Four shapes from the channel’s vocabulary on a 2×2 grid.',
+      palette: ['#1c1c1c', '#efe6d2', '#d6382c', '#2f6fd0', '#f2b705'], paletteNote: 'One of four palettes, fixed for this channel.',
+    },
+    konstrukt: {
+      name: 'Constructivism', native: 'Konstruktywizm', channel: 'Rozmowy o biznesie', type: 'Oswald',
+      blurb: 'Diagonals, a red wedge or circle, a black title band at the channel’s own angle, and a photomontage cut from the original thumbnail.',
+      avatarNote: 'The wedge and the initial, tilted to the channel’s angle.',
+      palette: ['#e8dcc2', '#1a1a1a', '#b5121b'], paletteNote: 'One of three palettes, fixed for this channel.',
+    },
+    jazz: {
+      name: 'Jazz ’60', native: 'Jazz ’60', channel: 'Blue Note Hour', type: 'Oswald with Inter Tight',
+      blurb: 'A record sleeve: the original thumbnail in duotone, a block of colour, one huge word from the title and the rest set small beneath it.',
+      avatarNote: 'The channel’s own avatar in duotone, initials on a colour bar.',
+      palette: ['#0e3a5b', '#f4f1ea', '#f5c518', '#0b2236', '#8fc1e3'], paletteNote: 'One of five palettes, fixed for this channel.',
+    },
+    ma: {
+      name: 'Ma 間', native: 'Japanese minimalism', channel: 'Slow Kyoto', type: 'Cormorant Garamond',
+      blurb: 'Emptiness first. A single circle, as a sun, an ensō or a horizon, a serif title on the opposite side and a hairline.',
+      avatarNote: 'One circle pushed off centre and a small initial.',
+      palette: ['#f3eee4', '#1b1b1b', '#c0392b', '#8a8174'], paletteNote: 'One of three palettes, fixed for this channel.',
+    },
+  };
+
+  const power = document.querySelectorAll('[data-power]');
+  for (const b of power) {
+    b.addEventListener('click', () => {
+      for (const o of power) o.setAttribute('aria-pressed', String(o === b));
+      for (const img of document.querySelectorAll('[data-shot]')) img.hidden = img.dataset.shot !== b.dataset.power;
+    });
+  }
+
+  const tabs = document.querySelectorAll('[data-style]');
+  const field = (name) => document.querySelector(`[data-f="${name}"]`);
+  const image = (name) => document.querySelector(`[data-img="${name}"]`);
+  const show = (id) => {
+    const s = STYLES[id];
+    for (const t of tabs) t.setAttribute('aria-pressed', String(t.dataset.style === id));
+    for (const key of ['native', 'name', 'blurb', 'avatarNote', 'type', 'paletteNote', 'channel']) field(key).textContent = s[key];
+    field('swatches').replaceChildren(...s.palette.map((hex) => Object.assign(document.createElement('span'), { title: hex, style: `background:${hex}` })));
+    image('poster1').src = `assets/poster-${id}-1.png`;
+    image('poster1').alt = `${s.name} poster for a video by ${s.channel}`;
+    image('poster2').src = `assets/poster-${id}-2.png`;
+    image('poster2').alt = `A second ${s.name} poster from the same channel, a variant of the same series`;
+    image('avatar').src = `assets/avatar-${id}.png`;
+    image('avatar').alt = `${s.channel} avatar in the ${s.name} style`;
+    image('short').src = `assets/short-${id}.png`;
+    image('short').alt = `${s.name} poster for a Short by ${s.channel}`;
+  };
+  for (const t of tabs) t.addEventListener('click', () => show(t.dataset.style));
+  // Warm the cache so switching styles does not flash.
+  for (const id of Object.keys(STYLES)) for (const f of ['poster-' + id + '-1', 'poster-' + id + '-2', 'avatar-' + id, 'short-' + id]) new Image().src = `assets/${f}.png`;
+})();
+</script>
+</body>
+</html>
