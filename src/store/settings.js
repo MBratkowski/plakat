@@ -1,0 +1,65 @@
+// User settings in chrome.storage.local:
+//   settings: { enabled, hoverReveal, avatars, commentAvatars, pool[], customStyles[],
+//               channels{ key: { styleId?, salt? } } }
+(() => {
+  const P = (globalThis.Plakat ??= {});
+
+  P.DEFAULTS = {
+    enabled: true,
+    hoverReveal: true,
+    avatars: true,
+    // Comment authors are people, not channels with a series: off unless asked for.
+    commentAvatars: false,
+    pool: P.BUILTIN_POOL.slice(),
+    customStyles: [],
+    channels: {},
+  };
+
+  P.normalizeSettings = (s) => {
+    s = s || {};
+    return {
+      ...P.DEFAULTS,
+      ...s,
+      pool: Array.isArray(s.pool) ? s.pool : P.DEFAULTS.pool.slice(),
+      customStyles: Array.isArray(s.customStyles) ? s.customStyles : [],
+      channels: s.channels && typeof s.channels === 'object' ? { ...s.channels } : {},
+    };
+  };
+
+  P.loadSettings = async () => {
+    const { settings } = await chrome.storage.local.get('settings');
+    return P.normalizeSettings(settings);
+  };
+
+  P.saveSettings = (s) => chrome.storage.local.set({ settings: s });
+
+  P.newStyleId = () => 'u_' + Math.random().toString(36).slice(2, 9);
+
+  // Validates an imported style (JSON from someone else). Messages are shown to the user.
+  P.sanitizeStyle = (raw) => {
+    if (!raw || typeof raw !== 'object') throw new Error(P.t('importNotStyle'));
+    const engine = P.ENGINES[raw.engine] ? raw.engine : null;
+    if (!engine) throw new Error(P.t('importUnknownEngine', raw.engine));
+    const hex = /^#[0-9a-f]{6}$/i;
+    const palettes = (Array.isArray(raw.palettes) ? raw.palettes : [])
+      .filter((p) => Array.isArray(p) && p.length >= 3 && p.every((c) => hex.test(c)))
+      .slice(0, 12)
+      .map((p) => p.slice(0, 5));
+    if (!palettes.length) throw new Error(P.t('importNoPalette'));
+    const params = {};
+    for (const f of P.ENGINES[engine].schema) {
+      const v = raw.params?.[f.key];
+      if (v == null) continue;
+      if (f.type === 'bool') params[f.key] = !!v;
+      else if (f.type === 'range') params[f.key] = Math.min(f.max, Math.max(f.min, +v || f.min));
+      else if (f.type === 'select' && f.options.some(([val]) => val === String(v))) params[f.key] = String(v);
+    }
+    return {
+      id: P.newStyleId(),
+      name: String(raw.name || P.t('importDefaultName')).slice(0, 40),
+      engine,
+      palettes,
+      params,
+    };
+  };
+})();

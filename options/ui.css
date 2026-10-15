@@ -1,0 +1,66 @@
+/* Plakat: UI tokens shared by the options page and the popup */
+:root {
+  --paper: #f4f1ea;
+  --paper-2: #e9e4d8;
+  --card: #fbf9f4;
+  --ink: #121212;
+  --muted: #6b665d;
+  --line: #d9d3c5;
+  --red: #e5322d;
+  --focus: #1f4fd8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #131313;
+    --paper-2: #1d1d1c;
+    --card: #191918;
+    --ink: #eeeae1;
+    --muted: #9b968c;
+    --line: #2d2c2a;
+    --red: #ff4a3d;
+    --focus: #7aa2ff;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { background: var(--paper); color: var(--ink); }
+body { margin: 0; font: 400 14px/1.45 "Plakat Inter Tight", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+.muted { color: var(--muted); }
+kbd { font: 600 11px/1 "Plakat Inter Tight", sans-serif; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--card); }
+
+.btn {
+  font: 600 13px/1 "Plakat Inter Tight", sans-serif;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.ghost { border-color: transparent; padding-left: 8px; padding-right: 8px; }
+.btn.ghost:hover { background: var(--paper-2); color: var(--ink); }
+.btn.danger:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.small { padding: 7px 11px; font-size: 12px; }
+.btn:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+select, input[type="text"], input[type="search"] {
+  font: 500 13px/1.2 "Plakat Inter Tight", sans-serif;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+select:hover, input[type="text"]:hover, input[type="search"]:hover { border-color: var(--muted); }
+
+/* switch */
+input.switch { appearance: none; width: 36px; height: 20px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; flex: none; transition: background 0.15s; margin: 0; }
+input.switch::after { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--card); top: 3px; left: 3px; transition: transform 0.15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+input.switch:checked { background: var(--red); }
+input.switch:checked::after { transform: translateX(16px); }

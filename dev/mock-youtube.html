@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>YouTube (mock)</title>
+<style>
+  body { margin: 0; background: #0f0f0f; color: #f1f1f1; font: 14px Roboto, Arial, sans-serif; }
+  ytd-app, ytd-rich-grid-renderer, ytd-rich-item-renderer, ytd-rich-grid-media, ytd-thumbnail, yt-image,
+  yt-lockup-view-model, yt-thumbnail-view-model, yt-content-metadata-view-model, ytm-shorts-lockup-view-model,
+  ytd-video-renderer, ytd-channel-name, #movie_player, ytd-masthead, ytd-guide-renderer, ytd-comments,
+  ytd-comment-thread-renderer, ytd-comment-view-model, ytd-comment-renderer, ytd-video-owner-renderer,
+  yt-page-header-view-model, yt-dynamic-text-view-model { display: block; }
+  yt-image { display: inline; } /* as on real YouTube: an inline wrapper around the img */
+  yt-img-shadow, yt-avatar-shape, yt-decorated-avatar-view-model { display: inline-block; vertical-align: top; }
+  h2 { font-size: 18px; margin: 24px 24px 12px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 24px; }
+  .shorts { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 0 24px; }
+  a { color: inherit; text-decoration: none; }
+  #thumbnail, .yt-lockup-view-model__content-image { display: block; position: relative; }
+  img.thumb { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; }
+  .shorts img.thumb { aspect-ratio: 9/16; }
+  img.av { display: block; width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+  img.av.s24 { width: 24px; height: 24px; }
+  img.av.s40 { width: 40px; height: 40px; }
+  img.av.s32 { width: 32px; height: 32px; }
+  img.av.s120 { width: 120px; height: 120px; }
+  .badge { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.8); color: #fff; font-size: 12px; font-weight: 500; padding: 1px 4px; border-radius: 4px; }
+  h3 { font-size: 15px; margin: 10px 0 4px; line-height: 1.35; }
+  .meta, ytd-channel-name { color: #aaa; font-size: 13px; }
+  #details, .yt-lockup-metadata-view-model { display: flex; gap: 12px; align-items: flex-start; margin-top: 10px; }
+  #details h3, .yt-lockup-metadata-view-model h3 { margin-top: 0; }
+  #movie_player { margin: 24px; width: 480px; position: relative; }
+  .search { padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
+  ytd-video-renderer { display: flex; gap: 16px; }
+  ytd-video-renderer ytd-thumbnail { width: 360px; flex: none; }
+  #channel-info { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  ytd-masthead { display: flex; justify-content: flex-end; padding: 8px 24px; border-bottom: 1px solid #222; }
+  ytd-guide-renderer { padding: 0 24px; width: 240px; }
+  ytd-guide-entry-renderer a { display: flex; gap: 16px; align-items: center; padding: 6px 0; }
+  .row { display: flex; gap: 12px; align-items: center; padding: 0 24px; }
+  ytd-comments { padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
+  ytd-comment-view-model, ytd-comment-renderer { display: flex; gap: 16px; }
+  yt-page-header-view-model { display: flex; gap: 24px; align-items: center; padding: 0 24px; }
+</style>
+</head>
+<body>
+<ytd-app>
+<ytd-masthead><ytd-topbar-menu-button-renderer><button id="avatar-btn"><yt-img-shadow id="avatar"><img class="av s32" id="me" src="https://yt3.ggpht.com/me=s88"></yt-img-shadow></button></ytd-topbar-menu-button-renderer></ytd-masthead>
+<div id="pageHeader"></div>
+<h2>Strona główna — stary DOM (ytd-rich-item-renderer)</h2>
+<div class="grid" id="old"></div>
+<h2>Strona główna — nowy DOM (yt-lockup-view-model)</h2>
+<div class="grid" id="new"></div>
+<h2>Shorts</h2>
+<div class="shorts" id="shorts"></div>
+<h2>Wyniki wyszukiwania</h2>
+<div class="search" id="search"></div>
+<h2>Odtwarzacz (ma zostać nietknięty)</h2>
+<div id="movie_player"><a href="/watch?v=ENDSCREEN1"><img class="thumb" src="https://i.ytimg.com/vi/ENDSCREEN1/mqdefault.jpg"></a></div>
+<h2>Strona filmu — właściciel (#owner)</h2>
+<div class="row" id="owner"></div>
+<h2>Menu — subskrypcje (ytd-guide-entry-renderer)</h2>
+<ytd-guide-renderer id="guide"></ytd-guide-renderer>
+<h2>Komentarze (domyślnie nietknięte)</h2>
+<ytd-comments id="comments"></ytd-comments>
+</ytd-app>
+<script>
+const pol = window.trustedTypes ? trustedTypes.createPolicy('mock', { createHTML: (x) => x }) : null;
+const setHTML = (el, html) => { el.innerHTML = pol ? pol.createHTML(html) : html; };
+const make = (tag, html) => { const el = document.createElement(tag); setHTML(el, html); return el; };
+const vids = [
+  ['Kanał Techniczny', '@kanaltechniczny', 'Jak zbudowałem własny serwer domowy za 500 zł | Homelab #12', '12:41'],
+  ['Android Developers', '@androiddevelopers', 'Kotlin Coroutines — Deep Dive into Structured Concurrency', '48:03'],
+  ['Ciekawe Miejsca', '@ciekawemiejsca', '10 rzeczy, których nie wiedziałeś o Krakowie 🤯', '15:20'],
+  ['Kanał Techniczny', '@kanaltechniczny', 'Proxmox od zera: klaster na trzech mini PC', '22:05'],
+  ['Design Talks', '@designtalks', 'Why Swiss Design Still Matters', '9:58'],
+  ['Rozmowy o biznesie', '@rozmowy', 'Podcast odc. 47 — O budowaniu startupu bez inwestorów', '1:32:10'],
+  ['Biegacz z Wrocławia', '@biegaczwro', 'Mój pierwszy półmaraton 🏃 21 km w deszczu', '18:44'],
+  ['Android Developers', '@androiddevelopers', 'Jetpack Compose Performance: Stability Explained', '31:12'],
+];
+const vid = (i) => 'VID' + String(i).padStart(8, '0');
+const thumbSrc = (id) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const avatarSrc = (handle) => `https://yt3.ggpht.com/${handle.slice(1)}=s88-c-k-c0x00ffffff-no-rj`;
+
+function oldCard(i) {
+  const [ch, handle, title, dur] = vids[i];
+  const id = vid(i);
+  return make('ytd-rich-item-renderer', `<div id="content"><ytd-rich-grid-media><div id="dismissible">
+    <ytd-thumbnail><a id="thumbnail" href="/watch?v=${id}"><yt-image><img class="thumb" src="${thumbSrc(id)}"></yt-image>
+      <div id="overlays"><span class="badge">${dur}</span></div></a></ytd-thumbnail>
+    <div id="details"><a id="avatar-link" href="/${handle}" title="${ch}"><yt-img-shadow id="avatar"><img class="av" id="img" src="${avatarSrc(handle)}"></yt-img-shadow></a>
+      <div><h3><a id="video-title" href="/watch?v=${id}" title="${title}">${title}</a></h3>
+      <ytd-channel-name><a href="/${handle}">${ch}</a></ytd-channel-name></div></div>
+  </div></ytd-rich-grid-media></div>`);
+}
+// The new lockup has no link around the avatar: the channel comes from the metadata link.
+function newCard(i) {
+  const [ch, handle, title, dur] = vids[i];
+  const id = vid(i);
+  return make('yt-lockup-view-model', `<div class="yt-lockup-view-model">
+    <a class="yt-lockup-view-model__content-image" href="/watch?v=${id}"><yt-thumbnail-view-model>
+      <div class="yt-thumbnail-view-model__image"><img class="thumb ytCoreImageHost" src="${thumbSrc(id)}"></div>
+      <div class="badge">${dur}</div></yt-thumbnail-view-model></a>
+    <div class="yt-lockup-metadata-view-model">
+      <yt-decorated-avatar-view-model><yt-avatar-shape><div class="yt-spec-avatar-shape"><img class="av ytCoreImageHost" src="${avatarSrc(handle)}"></div></yt-avatar-shape></yt-decorated-avatar-view-model>
+      <div><h3 title="${title}"><a href="/watch?v=${id}"><span>${title}</span></a></h3>
+      <yt-content-metadata-view-model class="meta"><span><a href="/${handle}">${ch}</a></span> · 12 tys. wyświetleń</yt-content-metadata-view-model></div></div></div>`);
+}
+function shortCard(i) {
+  const titles = ['Najszybszy ramen na świecie #shorts', 'Ten trik w Kotlinie oszczędzi Ci godzinę', 'Kraków w 30 sekund', 'Pies vs. odkurzacz', 'Bauhaus w 60 sekund', '3 błędy na pierwszym maratonie'];
+  const id = 'SHORT' + i;
+  return make('ytm-shorts-lockup-view-model', `<a href="/shorts/${id}"><img class="thumb" src="${thumbSrc(id)}"></a>
+    <h3><a href="/shorts/${id}"><span>${titles[i]}</span></a></h3><div class="meta">1,2 mln wyświetleń</div>`);
+}
+function searchCard(i) {
+  const [ch, handle, title] = vids[i];
+  const id = vid(i) + 'S';
+  return make('ytd-video-renderer', `<ytd-thumbnail><a id="thumbnail" href="/watch?v=${id}&pp=abc"><yt-image><img class="thumb" src="${thumbSrc(id)}"></yt-image></a></ytd-thumbnail>
+    <div><h3><a id="video-title" href="/watch?v=${id}" title="${title}">${title}</a></h3>
+    <div id="channel-info"><a id="channel-thumbnail" href="/${handle}"><yt-img-shadow><img class="av s24" src="${avatarSrc(handle)}"></yt-img-shadow></a>
+    <ytd-channel-name><a href="/${handle}">${ch}</a></ytd-channel-name></div></div>`);
+}
+// The last entry is a subscription with no videos on the page.
+const guide = [...[0, 1, 4, 5].map((i) => vids[i]), ['Kanał Tylko w Menu', '@tylkowmenu']];
+function guideEntry([ch, handle]) {
+  return make('ytd-guide-entry-renderer', `<a id="endpoint" href="/${handle}" title="${ch}"><yt-img-shadow><img class="av s24" src="${avatarSrc(handle)}"></yt-img-shadow>
+    <yt-formatted-string class="title">${ch}</yt-formatted-string></a>`);
+}
+// New comment DOM uses yt-avatar-shape, the old one yt-img-shadow; both must stay untouched by default.
+function comment(handle, text, legacy) {
+  const avatar = legacy
+    ? `<yt-img-shadow><img class="av s40" src="${avatarSrc(handle)}"></yt-img-shadow>`
+    : `<yt-avatar-shape><div><img class="av s40" src="${avatarSrc(handle)}"></div></yt-avatar-shape>`;
+  return make(legacy ? 'ytd-comment-renderer' : 'ytd-comment-view-model', `<div id="author-thumbnail"><a href="/${handle}">${avatar}</a></div>
+    <div id="main"><a id="author-text" href="/${handle}">${handle}</a><div id="content-text">${text}</div></div>`);
+}
+
+for (let i = 0; i < 4; i++) document.getElementById('old').appendChild(oldCard(i));
+for (let i = 4; i < 8; i++) document.getElementById('new').appendChild(newCard(i));
+for (let i = 0; i < 6; i++) document.getElementById('shorts').appendChild(shortCard(i));
+for (let i = 1; i < 3; i++) document.getElementById('search').appendChild(searchCard(i));
+for (const entry of guide) document.getElementById('guide').appendChild(guideEntry(entry));
+setHTML(document.getElementById('owner'), `<ytd-video-owner-renderer class="row"><a href="/@androiddevelopers"><yt-img-shadow id="avatar"><img class="av s40" src="${avatarSrc('@androiddevelopers')}"></yt-img-shadow></a>
+  <div id="upload-info"><ytd-channel-name><a href="/@androiddevelopers">Android Developers</a></ytd-channel-name><div class="meta">2,1 mln subskrypcji</div></div></ytd-video-owner-renderer>`);
+const comments = document.getElementById('comments');
+comments.appendChild(make('ytd-comment-simplebox-renderer', `<div id="author-thumbnail"><yt-img-shadow><img class="av s40" src="https://yt3.ggpht.com/me=s88"></yt-img-shadow></div> Dodaj komentarz…`));
+comments.appendChild(make('ytd-comment-thread-renderer', '')).appendChild(comment('@ania.k', 'Świetny materiał, dzięki!', false));
+comments.appendChild(make('ytd-comment-thread-renderer', '')).appendChild(comment('@designtalks', 'Dzięki za wzmiankę o naszym kanale.', true));
+
+// Channel page header: rendered only on /@handle URLs, like the real channel page.
+if (location.pathname.startsWith('/@')) {
+  setHTML(document.getElementById('pageHeader'), `<h2>Nagłówek kanału</h2><yt-page-header-view-model>
+    <yt-decorated-avatar-view-model><yt-avatar-shape><div><img class="av s120" src="${avatarSrc(location.pathname.slice(1))}"></div></yt-avatar-shape></yt-decorated-avatar-view-model>
+    <yt-dynamic-text-view-model><h1>Design Talks</h1></yt-dynamic-text-view-model></yt-page-header-view-model>`);
+}
+
+// Late hydration: a card without a title that appears after 1.2 s
+const late = newCard(0);
+const lateH3 = late.querySelector('h3'); const lateTitle = lateH3.innerHTML; setHTML(lateH3, ''); lateH3.removeAttribute('title');
+document.getElementById('new').appendChild(late);
+setTimeout(() => { setHTML(lateH3, lateTitle); }, 1200);
+
+// Element recycling: after 2 s the first card shows another video from another channel
+setTimeout(() => {
+  const c = document.querySelector('#old ytd-rich-item-renderer');
+  const id = 'RECYCLED01';
+  c.querySelector('#thumbnail').setAttribute('href', '/watch?v=' + id);
+  const t = c.querySelector('#video-title');
+  t.setAttribute('href', '/watch?v=' + id);
+  t.setAttribute('title', 'Recykling: ten sam element, nowy film o Bauhausie');
+  t.textContent = 'Recykling: ten sam element, nowy film o Bauhausie';
+  c.querySelectorAll('a[href^="/@"]').forEach((a) => a.setAttribute('href', '/@designtalks'));
+  c.querySelector('#avatar-link').setAttribute('title', 'Design Talks');
+  c.querySelector('#avatar img').setAttribute('src', avatarSrc('@designtalks'));
+  c.querySelector('ytd-channel-name a').textContent = 'Design Talks';
+}, 2000);
+</script>
+</body>
+</html>

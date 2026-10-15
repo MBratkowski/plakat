@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="optionsTitle"></title>
+<link rel="icon" href="../icons/icon32.png">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <div class="hero-type">
+      <h1>Plakat</h1>
+      <p class="lede" data-i18n="optionsLede"></p>
+    </div>
+    <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+  </header>
+
+  <section class="sec" id="secGeneral">
+    <h2><span class="num">01</span><span data-i18n="sectionGeneral"></span></h2>
+    <div class="general">
+      <label class="switch-row"><input type="checkbox" class="switch" id="enabled"><span><b data-i18n="switchEnabled"></b><br><span class="muted"><span data-i18n="switchEnabledHint"></span> <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span></span></label>
+      <label class="switch-row"><input type="checkbox" class="switch" id="hoverReveal"><span><b data-i18n="switchHoverReveal"></b><br><span class="muted" data-i18n="switchHoverRevealHint"></span></span></label>
+      <label class="switch-row"><input type="checkbox" class="switch" id="avatars"><span><b data-i18n="switchAvatars"></b><br><span class="muted" data-i18n="switchAvatarsHint"></span></span></label>
+      <label class="switch-row"><input type="checkbox" class="switch" id="commentAvatars"><span><b data-i18n="switchCommentAvatars"></b><br><span class="muted" data-i18n="switchCommentAvatarsHint"></span></span></label>
+    </div>
+  </section>
+
+  <section class="sec" id="secChannels">
+    <div class="sec-head">
+      <h2><span class="num">02</span><span data-i18n="sectionChannels"></span></h2>
+      <input type="search" id="chSearch" data-i18n-placeholder="channelSearchPlaceholder" data-i18n-aria-label="channelSearchLabel">
+    </div>
+    <p class="muted sec-lede" data-i18n="channelsLede"></p>
+    <div id="channels" class="channels"></div>
+  </section>
+
+  <section class="sec" id="secStyles">
+    <div class="sec-head">
+      <h2><span class="num">03</span><span data-i18n="sectionStyles"></span></h2>
+      <div class="sec-actions">
+        <button class="btn" id="importBtn" data-i18n="stylesImport"></button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </div>
+    <p class="muted sec-lede" data-i18n="stylesLede"></p>
+    <div id="styles" class="styles"></div>
+  </section>
+</main>
+
+<dialog id="editor" class="editor">
+  <form method="dialog" class="ed-shell" id="edForm">
+    <aside class="ed-side">
+      <div class="ed-top">
+        <input type="text" id="edName" class="ed-name" data-i18n-aria-label="editorNameLabel" maxlength="40">
+        <label class="field"><span data-i18n="editorEngine"></span><select id="edEngine"></select></label>
+      </div>
+      <div id="edParams" class="ed-params"></div>
+      <div class="ed-pal-head">
+        <h3 data-i18n="editorPalettes"></h3>
+        <div>
+          <button type="button" class="btn small" id="edRandPal" data-i18n="editorRandomPalette"></button>
+          <button type="button" class="btn small ghost" id="edAddPal" data-i18n="editorCopyPalette"></button>
+        </div>
+      </div>
+      <p class="muted tiny" data-i18n="editorPalettesHint"></p>
+      <div id="edPalettes" class="ed-palettes"></div>
+    </aside>
+    <section class="ed-main">
+      <div class="ed-main-head">
+        <label class="field inline"><span data-i18n="editorPreviewOn"></span><select id="edSource"></select></label>
+        <span class="muted tiny" id="edSourceNote"></span>
+      </div>
+      <div id="edAvatar" class="ed-avatar"></div>
+      <div id="edPreview" class="ed-preview"></div>
+      <h3 class="ed-sub" data-i18n="editorAllPalettes"></h3>
+      <div id="edPalPreview" class="ed-pal-preview"></div>
+    </section>
+    <footer class="ed-foot">
+      <button type="button" class="btn ghost" id="edExport" data-i18n="editorExport"></button>
+      <span class="spacer"></span>
+      <button type="button" class="btn" id="edCancel" data-i18n="editorCancel"></button>
+      <button type="button" class="btn" id="edSaveAssign" data-i18n="editorSaveAssign" hidden></button>
+      <button type="button" class="btn primary" id="edSave" data-i18n="editorSave"></button>
+    </footer>
+  </form>
+</dialog>
+
+<script src="../src/core/font-faces.js"></script>
+<script src="../src/core/i18n.js"></script>
+<script src="../src/core/random.js"></script>
+<script src="../src/core/vdom.js"></script>
+<script src="../src/core/color.js"></script>
+<script src="../src/core/typography.js"></script>
+<script src="../src/core/text.js"></script>
+<script src="../src/engines/kit.js"></script>
+<script src="../src/engines/swiss.js"></script>
+<script src="../src/engines/bauhaus.js"></script>
+<script src="../src/engines/konstrukt.js"></script>
+<script src="../src/engines/jazz.js"></script>
+<script src="../src/engines/ma.js"></script>
+<script src="../src/poster/styles.js"></script>
+<script src="../src/poster/render.js"></script>
+<script src="../src/store/settings.js"></script>
+<script src="../src/store/seen.js"></script>
+<script src="ui.js"></script>
+<script src="editor.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "short_name": "Plakat",
+  "version": "0.2.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "pl",
+  "permissions": ["storage"],
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "action": {
+    "default_title": "Plakat",
+    "default_popup": "popup/popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
+  },
+  "options_ui": { "page": "options/options.html", "open_in_tab": true },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": [
+        "src/core/font-faces.js",
+        "src/core/i18n.js",
+        "src/core/random.js",
+        "src/core/vdom.js",
+        "src/core/color.js",
+        "src/core/typography.js",
+        "src/core/text.js",
+        "src/engines/kit.js",
+        "src/engines/swiss.js",
+        "src/engines/bauhaus.js",
+        "src/engines/konstrukt.js",
+        "src/engines/jazz.js",
+        "src/engines/ma.js",
+        "src/poster/styles.js",
+        "src/poster/render.js",
+        "src/store/settings.js",
+        "src/store/seen.js",
+        "src/content/youtube.js",
+        "src/content/overlay.js",
+        "src/content/seen-recorder.js",
+        "src/content/thumbnails.js",
+        "src/content/avatars.js",
+        "src/content/main.js"
+      ],
+      "css": ["src/content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    { "resources": ["fonts/*"], "matches": ["https://www.youtube.com/*"] }
+  ]
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Plakat — dev gallery</title>
+<style>
+  body { margin: 0; padding: 24px; background: #0f0f0f; color: #eee; font: 13px system-ui; }
+  h2 { margin: 28px 0 10px; font-weight: 600; }
+  .row { display: grid; grid-template-columns: repeat(4, 320px) 101px; gap: 14px; align-items: start; margin-bottom: 10px; }
+  .card { width: 320px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #222; }
+  .card.short { width: 101px; aspect-ratio: 9/16; }
+  .meta { display: flex; gap: 10px; align-items: flex-start; font-size: 11px; color: #999; margin-top: 8px; width: 320px; }
+  .meta b { display: block; color: #ddd; font-weight: 600; margin-bottom: 2px; }
+  .av { flex: none; border-radius: 50%; overflow: hidden; background: #222; }
+  .av svg { display: block; width: 100%; height: 100%; }
+  .sizes { display: flex; gap: 18px; align-items: center; margin: 6px 0 4px; }
+</style>
+<script src="../src/core/font-faces.js"></script>
+<script src="../src/core/i18n.js"></script>
+<script src="../src/core/random.js"></script>
+<script src="../src/core/vdom.js"></script>
+<script src="../src/core/color.js"></script>
+<script src="../src/core/typography.js"></script>
+<script src="../src/core/text.js"></script>
+<script src="../src/engines/kit.js"></script>
+<script src="../src/engines/swiss.js"></script>
+<script src="../src/engines/bauhaus.js"></script>
+<script src="../src/engines/konstrukt.js"></script>
+<script src="../src/engines/jazz.js"></script>
+<script src="../src/engines/ma.js"></script>
+<script src="../src/poster/styles.js"></script>
+<script src="../src/poster/render.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ?style=<id> shows one style, ?salt=<n> shifts every seed.
+// Opened from disk there is no chrome.i18n, so styles are headed by their id.
+const P = Plakat;
+const samples = [
+  ['Kanał Techniczny', 'Jak zbudowałem własny serwer domowy za 500 zł | Homelab #12', 'v1'],
+  ['Android Developers', 'Kotlin Coroutines — Deep Dive into Structured Concurrency', 'v2'],
+  ['Ciekawe Miejsca', '10 rzeczy, których nie wiedziałeś o Krakowie 🤯', 'v3'],
+  ['Design Talks', 'Why Swiss Design Still Matters', 'v4'],
+  ['Rozmowy o biznesie', 'Podcast odc. 47 — O budowaniu startupu bez inwestorów', 'v5'],
+  ['Biegacz z Wrocławia', 'Mój pierwszy półmaraton 🏃 21 km w deszczu', 'v6'],
+  ['Kuchnia Szybka', 'Najszybszy ramen na świecie #shorts', 'v7'],
+];
+const params = new URLSearchParams(location.search);
+const only = params.get('style');
+const baseSalt = params.get('salt') | 0;
+
+const div = (cls, ...kids) => {
+  const el = document.createElement('div');
+  if (cls) el.className = cls;
+  el.append(...kids);
+  return el;
+};
+const avatar = (style, { salt, channelName, channelKey, thumbUrl }, px) => {
+  const box = div('av');
+  box.style.width = box.style.height = px + 'px';
+  box.appendChild(P.toDom(P.renderAvatar({ style, salt, channelName, channelKey, thumbUrl })));
+  return box;
+};
+
+(async () => {
+  await P.loadFonts();
+  await document.fonts.ready;
+  const root = document.getElementById('root');
+  for (const style of P.BUILTIN_STYLES) {
+    if (only && style.id !== only) continue;
+    const h2 = document.createElement('h2'); h2.textContent = style.id; root.appendChild(h2);
+    for (const variant of [0, 1]) {
+      const row = div('row'); root.appendChild(row);
+      const picks = variant === 0 ? [0, 1, 2, 3] : [4, 5, 0, 2];
+      const channels = picks.map((i, k) => {
+        const [channelName, title, vid] = samples[i];
+        const ch = { salt: baseSalt + variant * 7 + k, channelName, channelKey: channelName + variant, thumbUrl: `thumbs/t${(i + variant + 4) % 8}.jpg` };
+        const card = div('card');
+        card.appendChild(P.toDom(P.render({ style, ...ch, title, vid: vid + variant, thumbUrl: `thumbs/t${(i + variant) % 8}.jpg`, W: 480, H: 270 })));
+        const text = div('', title);
+        text.prepend(Object.assign(document.createElement('b'), { textContent: channelName }));
+        row.appendChild(div('', card, div('meta', avatar(style, ch, 36), text)));
+        return ch;
+      });
+      const s = samples[6];
+      const card = div('card short');
+      card.appendChild(P.toDom(P.render({ style, salt: baseSalt + variant, title: s[1], channelName: s[0], channelKey: s[0] + variant, vid: s[2] + variant, thumbUrl: `thumbs/t${variant + 3}.jpg`, W: 480, H: 853 })));
+      row.appendChild(card);
+      // Real YouTube sizes: channel header, watch page owner, guide entry.
+      root.appendChild(div('sizes', ...channels.flatMap((ch) => [96, 40, 24].map((px) => avatar(style, ch, px)))));
+    }
+  }
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>

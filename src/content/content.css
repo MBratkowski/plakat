@@ -1,0 +1,32 @@
+/* Plakat: overlays on thumbnails and avatars */
+.plakat-ov {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  transition: opacity 0.18s ease;
+}
+.plakat-ov > svg { display: block; width: 100%; height: 100%; }
+.plakat-av { border-radius: 50%; }
+html.plakat-hover a.plakat-a:hover .plakat-thumb,
+html.plakat-hover .plakat-av-host:hover > .plakat-av { opacity: 0; transition-delay: 0.12s; }
+html.plakat-off .plakat-ov { display: none !important; }
+
+.plakat-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 12px);
+  z-index: 2147483647;
+  padding: 10px 16px;
+  border-radius: 4px;
+  background: #111;
+  color: #f1ede4;
+  font: 600 13px/1.2 "Plakat Inter Tight", system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.plakat-toast.show { opacity: 1; transform: translate(-50%, 0); }

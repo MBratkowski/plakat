@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../options/ui.css">
+<link rel="stylesheet" href="popup.css">
+</head>
+<body class="popup">
+  <header class="pop-head">
+    <div class="mark" aria-hidden="true"><span></span></div>
+    <div>
+      <h1>Plakat</h1>
+      <p class="muted" data-i18n="popupTagline"></p>
+    </div>
+  </header>
+  <div id="preview" class="pop-preview"></div>
+  <label class="switch-row">
+    <span data-i18n="switchEnabled"></span>
+    <input type="checkbox" id="enabled" class="switch">
+  </label>
+  <label class="switch-row">
+    <span data-i18n="switchHoverReveal"></span>
+    <input type="checkbox" id="hoverReveal" class="switch">
+  </label>
+  <p class="hint"><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> <span data-i18n="popupShortcutHint"></span></p>
+  <button id="open" class="btn primary wide" data-i18n="popupOpenOptions"></button>
+  <script src="../src/core/font-faces.js"></script>
+  <script src="../src/core/i18n.js"></script>
+  <script src="../src/core/random.js"></script>
+  <script src="../src/core/vdom.js"></script>
+  <script src="../src/core/color.js"></script>
+  <script src="../src/core/typography.js"></script>
+  <script src="../src/core/text.js"></script>
+  <script src="../src/engines/kit.js"></script>
+  <script src="../src/engines/swiss.js"></script>
+  <script src="../src/engines/bauhaus.js"></script>
+  <script src="../src/engines/konstrukt.js"></script>
+  <script src="../src/engines/jazz.js"></script>
+  <script src="../src/engines/ma.js"></script>
+  <script src="../src/poster/styles.js"></script>
+  <script src="../src/poster/render.js"></script>
+  <script src="../src/store/settings.js"></script>
+  <script src="../src/store/seen.js"></script>
+  <script src="../options/ui.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
