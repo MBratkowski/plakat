@@ -81,19 +81,26 @@
 
   P.allStyles = (settings) => [...P.BUILTIN_STYLES, ...((settings && settings.customStyles) || [])];
 
-  // A pinned style wins; otherwise the channel seed picks one from the pool.
-  P.resolveStyle = (settings, channelKey) => {
+  // A pinned style wins; otherwise the channel seed picks one from the pool. With
+  // settings.byTopic on, a channel with a known topic (see src/core/topics.js) draws from
+  // that topic's pool instead, with the same seed. A channel without a topic, a topic
+  // with an empty pool, and every channel while byTopic is off keep the plain pick.
+  P.resolveStyle = (settings, channelKey, topic) => {
     const styles = P.allStyles(settings);
     const conf = (settings.channels || {})[channelKey] || {};
     const salt = conf.salt || 0;
     let style = conf.styleId && styles.find((s) => s.id === conf.styleId);
     const pinned = !!style;
+    let fromTopic = false;
     if (!style) {
-      const pool = styles.filter((s) => (settings.pool || P.BUILTIN_POOL).includes(s.id));
+      const from = (ids) => styles.filter((s) => ids.includes(s.id));
+      const topicPool = settings.byTopic && topic ? from(settings.topicPools?.[topic] || []) : [];
+      fromTopic = topicPool.length > 0;
+      const pool = fromTopic ? topicPool : from(settings.pool || P.BUILTIN_POOL);
       // An empty pool falls back to every style that is not opt-in, as before tech styles existed.
       const list = pool.length ? pool : styles.filter((s) => !s.optIn);
       style = list[Math.floor(P.rng(`pool|${channelKey}|${salt}`)() * list.length)];
     }
-    return { style, salt, pinned };
+    return { style, salt, pinned, fromTopic };
   };
 })();

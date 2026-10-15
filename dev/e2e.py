@@ -29,7 +29,11 @@ NAMES = {
     "@kanaltechniczny": "Kanał Techniczny", "@androiddevelopers": "Android Developers",
     "@ciekawemiejsca": "Ciekawe Miejsca", "@designtalks": "Design Talks",
     "@rozmowy": "Rozmowy o biznesie", "@biegaczwro": "Biegacz z Wrocławia", "@tylkowmenu": "Kanał Tylko w Menu",
+    "@linuxodpodstaw": "Linux od podstaw", "@kodikawa": "Kod i Kawa", "@graniespokojnie": "Granie na Spokojnie",
 }
+# Channels of the mock's "programowanie" search page, and the styles of the tech topic pool.
+TECH_CHANNELS = {"@linuxodpodstaw", "@kodikawa"}
+TECH_STYLES = {"terminal", "kod"}
 
 failures = []
 
@@ -146,6 +150,36 @@ UNLOCALIZED_JS = """() => [...document.querySelectorAll('*')].flatMap((e) => [..
 
 def count_imgs(page, selector):
     return page.evaluate(f"document.querySelectorAll({json.dumps(selector)}).length")
+
+
+# Channel key -> style ids of its thumbnails and avatars, from the overlay signatures.
+def styles_by_channel(page):
+    out = {}
+    for o in overlays(page):
+        out.setdefault(o["key"], set()).add(o["sig"].split("|")[3])
+    return out
+
+
+# Loads url (or reloads) in the YouTube tab and brings it to the front: a background tab
+# gets no IntersectionObserver callbacks, so nothing new would render there.
+def show(page, url=None, wait=2500):
+    if url:
+        page.goto(url)
+    else:
+        page.reload()
+    page.bring_to_front()
+    page.wait_for_timeout(wait)
+
+
+# seen and topics from storage, polled until ok(stored) holds (the content script writes every 4 s).
+def wait_stored(opts, ok, seconds=12):
+    for _ in range(seconds * 2):
+        st = opts.evaluate("async () => chrome.storage.local.get(['seen', 'topics'])")
+        st = {"seen": st.get("seen") or {}, "topics": st.get("topics") or {}}
+        if ok(st):
+            break
+        opts.wait_for_timeout(500)
+    return st
 
 
 # ---------- Scenarios ----------
@@ -275,11 +309,15 @@ def options_checks(context, page, ext_id, with_editor):
 
     # Privacy: the data note links the policy, and clearing forgets every seen channel.
     check("options: data note links the privacy policy", (opts.get_attribute("#dataNote a", "href") or "").endswith("/plakat/privacy.html"))
+    topics_count = "async () => Object.keys((await chrome.storage.local.get('topics')).topics || {}).length"
+    topics_before = opts.evaluate(topics_count)
     opts.click("#clearSeen")
     opts.click("#clearSeen")
     opts.wait_for_timeout(300)
     left = opts.evaluate("async () => Object.keys((await chrome.storage.local.get('seen')).seen || {}).length")
     check("options: clearing empties the channel list", left == 0 and opts.locator(".ch-row").count() == 0, left)
+    topics_left = opts.evaluate(topics_count)
+    check("options: clearing also forgets channel topics", topics_before > 0 and topics_left == 0, (topics_before, topics_left))
     check("options: clear button is disabled on an empty list", opts.is_disabled("#clearSeen"))
 
     if with_editor:
@@ -305,6 +343,116 @@ def channel_page_checks(page):
     check("channel page: header avatar uses the page's channel", len(header) == 1 and header[0]["key"] == "@designtalks", header)
     check("channel page: header avatar matches the channel's thumbnails", header and {header[0]["palette"]} == designtalks, (header, designtalks))
     page.screenshot(path=str(OUT / "channel-page.png"))
+
+
+def topic_checks(context, page, ext_id):
+    opts = context.new_page()
+    opts.goto(f"chrome-extension://{ext_id}/options/options.html")
+    opts.wait_for_selector("body[data-ready]")
+    check("topics: style by topic is off by default", not opts.is_checked("#byTopic"))
+
+    # Topics are detected from titles whether or not the feature is on.
+    show(page, YT + "/results?search_query=programowanie")  # waits past the mock's hydration and recycling
+    first = styles_by_channel(page)
+    check("topics: tech search results rendered", TECH_CHANNELS <= set(first), sorted(first))
+    topics = wait_stored(opts, lambda st: TECH_CHANNELS <= set(st["topics"]))["topics"]
+    tech = TECH_CHANNELS | {"@kanaltechniczny", "@androiddevelopers"}
+    check("topics: clearly tech channels are detected as tech", all(topics.get(k) == "tech" for k in tech), topics)
+    check("topics: channels with unclear titles get no topic", not {"@ciekawemiejsca", "@rozmowy", "@biegaczwro"} & set(topics), topics)
+
+    # Feature off: known topics change nothing.
+    show(page)
+    off = styles_by_channel(page)
+    check("feature off: detected topics change no channel's style", off == first,
+          {k: (first.get(k), off.get(k)) for k in set(first) | set(off) if first.get(k) != off.get(k)})
+    check("feature off: no channel gets a tech style", not any(v & TECH_STYLES for v in off.values()), off)
+    plain = opts.evaluate("""async (keys) => {
+        const s = Plakat.normalizeSettings((await chrome.storage.local.get('settings')).settings);
+        return Object.fromEntries(keys.map((k) => [k, Plakat.resolveStyle(s, k).style.id]));
+    }""", sorted(off))
+    check("feature off: every channel keeps its plain pick", all(off[k] == {plain[k]} for k in off), (off, plain))
+
+    # Feature on: tech channels draw from the tech pool, everyone else stays.
+    opts.click("#byTopic")
+    page.wait_for_timeout(1000)
+    on = styles_by_channel(page)
+    on_tech = {k: on.get(k) for k in tech if k in off}
+    check("feature on: tech channels draw from Terminal and Kod", len(on_tech) >= 3 and all(v and v <= TECH_STYLES for v in on_tech.values()), on_tech)
+    rest = {k: (off[k], on.get(k)) for k in off if topics.get(k) != "tech"}
+    check("feature on: channels without a tech topic keep their style", rest and all(a == b for a, b in rest.values()), rest)
+    pals = {}
+    for o in overlays(page):
+        if o["key"] in TECH_CHANNELS:
+            pals.setdefault(o["key"], {}).setdefault(o["kind"], set()).add(o["palette"])
+    check("feature on: avatar and thumbnails of a tech channel still match",
+          all(v.get("av") and v["av"] == v.get("thumb") for v in pals.values()) and len(pals) == len(TECH_CHANNELS), pals)
+    page.screenshot(path=str(OUT / "youtube-topics.png"), full_page=True)
+
+    # Options: each row shows its topic, topic pools are editable.
+    opts.reload()
+    opts.wait_for_selector("body[data-ready]")
+    rows = opts.evaluate("""() => Object.fromEntries([...document.querySelectorAll('.ch-row')].map((r) => {
+        const t = r.querySelector('.ch-topic');
+        return [r.querySelector('.ch-key').textContent, [t.dataset.topic, t.textContent]];
+    }))""")
+    check("options: channel rows show the detected topic",
+          rows.get("@kodikawa", [""])[0] == "tech" and "Technologia" in rows["@kodikawa"][1]
+          and rows.get("@ciekawemiejsca", ["?"])[0] == "", rows)
+    check("options: a tech row says its style comes from the topic pool", "styl z puli tematu" in rows.get("@kodikawa", ["", ""])[1], rows.get("@kodikawa"))
+    pool = opts.evaluate("() => [...document.querySelectorAll('.tp-row[data-topic=tech] input:checked')].map((b) => b.value)")
+    check("options: one pool row per topic, tech defaults to Terminal and Kod",
+          opts.locator(".tp-row").count() == 8 and sorted(pool) == ["kod", "terminal"], pool)
+    raw = opts.evaluate(UNLOCALIZED_JS)
+    check("options: topic section text comes from the catalog", not raw, raw)
+    opts.screenshot(path=str(OUT / "options-topics.png"), full_page=True)
+    opts.click(".tp-row[data-topic=tech] input[value=kod]")
+    page.wait_for_timeout(1000)
+    only = {k: styles_by_channel(page).get(k) for k in TECH_CHANNELS}
+    check("options: editing a topic pool applies on YouTube", all(v == {"terminal"} for v in only.values()), only)
+    opts.click(".tp-row[data-topic=tech] input[value=kod]")
+    page.wait_for_timeout(500)
+
+    # The channel theme takes the same series as the posters, topic included.
+    opts.select_option("#theme", "channel")
+    show(page, YT + "/watch?v=VID00000001", 1500)
+    sheet = page.evaluate("() => ({ ...(document.getElementById('plakat-theme')?.dataset || {}) })")
+    owner = overlays(page, "av", "#owner")
+    check("feature on: the channel theme follows a tech channel's topic style",
+          sheet.get("channel") == "@androiddevelopers" and owner and sheet.get("palette") == owner[0]["palette"]
+          and styles_by_channel(page).get("@androiddevelopers", set()) <= TECH_STYLES, (sheet, owner and owner[0]["palette"]))
+    opts.select_option("#theme", "off")
+
+    # Sticky: the tech channel posts cooking videos; its topic and look stay.
+    show(page, YT + "/results?search_query=kuchnia", 0)
+    st = wait_stored(opts, lambda st: len(st["seen"].get("@kodikawa", {}).get("items", [])) >= 9)
+    fresh = opts.evaluate("(e) => Plakat.detectTopic(e)", st["seen"].get("@kodikawa"))
+    check("sticky: the new titles alone would make the channel a cooking one", fresh == "cooking", fresh)
+    check("sticky: the channel keeps its tech topic", st["topics"].get("@kodikawa") == "tech", st["topics"].get("@kodikawa"))
+    kod = styles_by_channel(page).get("@kodikawa")
+    check("sticky: the channel keeps a tech style", bool(kod) and kod <= TECH_STYLES, kod)
+
+    # Page metadata: channel page keywords, a watch page's tags and category.
+    show(page, YT + "/@designtalks", 0)
+    st = wait_stored(opts, lambda st: "@designtalks" in st["topics"])
+    check("channel page: meta keywords settle the channel's topic",
+          st["topics"].get("@designtalks") == "design" and "typografia" in st["seen"].get("@designtalks", {}).get("keywords", ""),
+          (st["topics"].get("@designtalks"), st["seen"].get("@designtalks", {}).get("keywords")))
+    show(page, YT + "/watch?v=GAME0001", 0)
+    st = wait_stored(opts, lambda st: "@graniespokojnie" in st["topics"])
+    entry = st["seen"].get("@graniespokojnie", {"items": []})
+    item = next((i for i in entry["items"] if i["vid"] == "GAME0001"), {})
+    check("watch page: the watched video is recorded with its tags and category",
+          item.get("genre") == "Gaming" and "minecraft" in item.get("tags", "") and entry.get("name") == "Granie na Spokojnie", entry)
+    titles_only = opts.evaluate("(e) => Plakat.detectTopic({ ...e, items: e.items.map(({ vid, title }) => ({ vid, title })) })", entry)
+    check("watch page: tags and category settle the owner's topic where titles alone do not",
+          st["topics"].get("@graniespokojnie") == "gaming" and titles_only is None, (st["topics"].get("@graniespokojnie"), titles_only))
+
+    # Feature off again: back to the plain picks.
+    opts.click("#byTopic")
+    show(page, YT + "/results?search_query=programowanie")
+    again = styles_by_channel(page)
+    check("feature off again: every channel is back to its plain pick", all(again.get(k) == off[k] for k in off),
+          {k: (off[k], again.get(k)) for k in off if again.get(k) != off[k]})
 
 
 # The theme: YouTube's tokens on <html> and inside the player, contrast of every text
@@ -482,6 +630,7 @@ def main():
         channel_page_checks(page)
         if ext_id:
             theme_checks(context, page, ext_id)
+            topic_checks(context, page, ext_id)
         context.close()
     print(f"\n{'OK' if not failures else f'{len(failures)} FAILED'}  ·  screenshots: {OUT}")
     sys.exit(1 if failures else 0)

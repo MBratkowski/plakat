@@ -1,15 +1,15 @@
-// Options page: general switches, seen channels, the style library and the editor.
+// Options page: general switches, seen channels, the style library, topic pools and the editor.
 (async () => {
   const P = Plakat;
   const { $, el, localize, SAMPLES, thumb, avatar, downloadStyle, confirmButton } = P.ui;
 
   localize();
   await P.loadFonts();
-  const state = { settings: await P.loadSettings(), seen: await P.loadSeen() };
+  const state = { settings: await P.loadSettings(), seen: await P.loadSeen(), topics: await P.loadTopics() };
   const save = () => P.saveSettings(state.settings);
   const editor = P.ui.createEditor({
     state, save,
-    onCommit: () => { renderStyles(); renderChannels(); },
+    onCommit: () => { renderStyles(); renderChannels(); renderTopics(); },
   });
 
   // ---------- Header ----------
@@ -24,8 +24,8 @@
     setInterval(draw, 3200);
   };
 
-  // ---------- 01 General ----------
-  const SWITCHES = ['enabled', 'hoverReveal', 'avatars', 'commentAvatars'];
+  // ---------- 01 General (and the topic switch in 04) ----------
+  const SWITCHES = ['enabled', 'hoverReveal', 'avatars', 'commentAvatars', 'byTopic'];
   const renderGeneral = () => {
     for (const key of SWITCHES) {
       const box = $('#' + key);
@@ -34,6 +34,7 @@
         state.settings[key] = box.checked;
         save();
         renderGeneral();
+        if (key === 'byTopic') { renderChannels(); renderTopics(); }
       };
     }
     // Comment avatars only make sense while channel avatars are on.
@@ -49,10 +50,15 @@
 
   // ---------- 02 Channels ----------
   let chLimit = 25;
+  const topicLine = (topic, fromTopic) => el('div', { class: 'ch-topic muted', 'data-topic': topic || '' },
+    topic ? P.t('channelTopic', P.topicName(topic)) : P.t('channelTopicUnknown'),
+    fromTopic ? el('span', { class: 'topic-pool', text: P.t('channelTopicPool') }) : null);
+
   const channelRow = (key, ch) => {
     const { settings } = state;
-    const { style, salt, pinned } = P.resolveStyle(settings, key);
-    const auto = P.resolveStyle({ ...settings, channels: { ...settings.channels, [key]: { salt } } }, key).style;
+    const topic = state.topics[key];
+    const { style, salt, pinned, fromTopic } = P.resolveStyle(settings, key, topic);
+    const auto = P.resolveStyle({ ...settings, channels: { ...settings.channels, [key]: { salt } } }, key, topic).style;
     const items = (ch.items || []).slice(0, 3);
     while (items.length < 3) items.push(SAMPLES[items.length]);
     const series = { channelKey: key, channelName: ch.name, salt };
@@ -77,6 +83,7 @@
       el('div', { class: 'ch-info' },
         el('div', { class: 'ch-name' }, ch.name || key, pinned ? el('span', { class: 'pin', text: P.t('channelPinned') }) : null),
         el('div', { class: 'ch-key muted', text: key.startsWith('name:') ? P.t('channelNoLink') : key }),
+        topicLine(topic, fromTopic),
         sel,
         el('div', { class: 'ch-actions' },
           el('button', {
@@ -99,7 +106,9 @@
   const clearSeen = confirmButton(P.t('channelsClear'), async () => {
     await P.clearSeen();
     state.seen = {};
+    state.topics = {};
     renderChannels();
+    renderTopics();
   });
   clearSeen.id = 'clearSeen';
   $('#dataNote').appendChild(clearSeen);
@@ -134,10 +143,12 @@
     const { settings } = state;
     settings.customStyles = settings.customStyles.filter((s) => s.id !== id);
     settings.pool = settings.pool.filter((x) => x !== id);
+    for (const t of Object.keys(settings.topicPools)) settings.topicPools[t] = settings.topicPools[t].filter((x) => x !== id);
     for (const c of Object.values(settings.channels)) if (c.styleId === id) delete c.styleId;
     save();
     renderStyles();
     renderChannels();
+    renderTopics();
   };
 
   const renderStyles = () => {
@@ -169,6 +180,38 @@
     }));
   };
 
+  // ---------- 04 Topics ----------
+  // One row per topic: how many listed channels have it, and the styles its pool draws from.
+  const renderTopics = () => {
+    const { settings, seen, topics } = state;
+    // Rows are rebuilt on every change; keep keyboard focus on the chip that had it.
+    const active = document.activeElement;
+    const focus = active?.closest?.('.tp-row') ? [active.closest('.tp-row').dataset.topic, active.value] : null;
+    const counts = {};
+    for (const key of Object.keys(seen)) if (topics[key]) counts[topics[key]] = (counts[topics[key]] || 0) + 1;
+    $('#topics').classList.toggle('off', !settings.byTopic);
+    $('#topics').replaceChildren(...P.TOPICS.map((topic) => {
+      const ids = settings.topicPools[topic.id];
+      return el('div', { class: 'tp-row', 'data-topic': topic.id },
+        el('div', { class: 'tp-name' },
+          el('b', { text: topic.name }),
+          el('div', { class: 'muted tiny', text: P.t('topicChannels', counts[topic.id] || 0) })),
+        el('div', { class: 'tp-styles', role: 'group', 'aria-label': P.t('topicPoolLabel', topic.name) },
+          P.allStyles(settings).map((style) => {
+            const box = el('input', { type: 'checkbox', value: style.id, checked: ids.includes(style.id) });
+            box.onchange = () => {
+              settings.topicPools[topic.id] = box.checked ? [...new Set([...ids, style.id])] : ids.filter((x) => x !== style.id);
+              save();
+              renderTopics();
+              renderChannels();
+            };
+            return el('label', { class: 'tp-chip' }, box, style.name);
+          }),
+          ids.length ? null : el('span', { class: 'muted tiny tp-empty', text: P.t('topicPoolEmpty') })));
+    }));
+    if (focus) $(`.tp-row[data-topic="${focus[0]}"] input[value="${focus[1]}"]`)?.focus();
+  };
+
   $('#importBtn').onclick = () => $('#importFile').click();
   $('#importFile').onchange = async (e) => {
     const file = e.target.files[0];
@@ -180,6 +223,7 @@
       state.settings.pool.push(style.id);
       await save();
       renderStyles();
+      renderTopics();
       editor.open(style, { isNew: false });
     } catch (err) {
       $('#importBtn').textContent = P.t('stylesImportError', err.message);
@@ -199,11 +243,18 @@
       state.seen = changes.seen.newValue || {};
       if (Object.keys(state.seen).length !== before && !editor.isOpen()) renderChannels();
     }
+    // A newly detected topic can change a channel's style.
+    if (changes.topics) {
+      state.topics = changes.topics.newValue || {};
+      if (!editor.isOpen()) renderChannels();
+    }
+    if (changes.settings || changes.topics) renderTopics();
   });
 
   heroArt();
   renderGeneral();
   renderChannels();
   renderStyles();
+  renderTopics();
   document.body.dataset.ready = '1';
 })();

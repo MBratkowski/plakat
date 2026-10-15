@@ -142,22 +142,25 @@
   };
 
   // What the theme shows on this page: the series of the page's channel in 'channel'
-  // mode, paper everywhere else.
-  const lookFor = (settings) => {
+  // mode, paper everywhere else. The channel's topic goes in, as for its posters.
+  const lookFor = (settings, topics) => {
     const key = settings.theme === 'channel' ? yt.pageChannelKey() : null;
     if (!key) return { key: '', palette: PAPER, font: PAPER_FONT };
-    const { style, salt } = P.resolveStyle(settings, key);
+    const { style, salt } = P.resolveStyle(settings, key, topics[key]);
     return { key, palette: P.paletteFor({ style, salt, channelKey: key }), font: P.titleFontOf(style) };
   };
 
   let current = null;
+  let currentTopics = {};
   let lastSig = '';
   let darkObserver = null;
 
   // Cheap when nothing changed, so it can run on every scan: the sheet is rewritten only
   // when the mode, the page's channel, its series or YouTube's light/dark theme changes.
-  const apply = (settings) => {
+  // `topics` is the stored channel -> topic map (src/store/seen.js).
+  const apply = (settings, topics = {}) => {
     current = settings;
+    currentTopics = topics;
     const root = document.documentElement;
     if (!settings || !settings.enabled || settings.theme === 'off') {
       sheet?.remove();
@@ -165,7 +168,7 @@
       lastSig = '';
       return;
     }
-    const look = lookFor(settings);
+    const look = lookFor(settings, topics);
     const pal = look.palette;
     const palette = [pal.bg, pal.fg, pal.a1, pal.a2, pal.a3].join(' ');
     const sig = [settings.theme, look.key, palette, look.font, root.hasAttribute('dark')].join('|');
@@ -179,7 +182,7 @@
     root.classList.add(CLS);
 
     // YouTube's appearance setting flips html[dark] without a navigation.
-    darkObserver ??= new MutationObserver(() => apply(current));
+    darkObserver ??= new MutationObserver(() => apply(current, currentTopics));
     darkObserver.observe(root, { attributes: true, attributeFilter: ['dark'] });
   };
 

@@ -1,6 +1,6 @@
 // User settings in chrome.storage.local:
 //   settings: { enabled, hoverReveal, avatars, commentAvatars, theme, pool[], customStyles[],
-//               channels{ key: { styleId?, salt? } } }
+//               channels{ key: { styleId?, salt? } }, byTopic, topicPools{ topic: styleId[] } }
 (() => {
   const P = (globalThis.Plakat ??= {});
 
@@ -15,6 +15,10 @@
     pool: P.BUILTIN_POOL.slice(),
     customStyles: [],
     channels: {},
+    // Style by channel topic: off by default, so channels keep the look they have.
+    // A topic with an empty pool draws from `pool` like any other channel.
+    byTopic: false,
+    topicPools: { tech: ['terminal', 'kod'] },
   };
 
   P.THEMES = ['off', 'paper', 'channel'];
@@ -28,6 +32,12 @@
       pool: Array.isArray(s.pool) ? s.pool : P.DEFAULTS.pool.slice(),
       customStyles: Array.isArray(s.customStyles) ? s.customStyles : [],
       channels: s.channels && typeof s.channels === 'object' ? { ...s.channels } : {},
+      byTopic: !!s.byTopic,
+      // Every topic gets an array; topics missing from storage (or added later) get the default.
+      topicPools: Object.fromEntries(P.TOPICS.map(({ id }) => {
+        const ids = s.topicPools?.[id];
+        return [id, Array.isArray(ids) ? ids.slice() : (P.DEFAULTS.topicPools[id] || []).slice()];
+      })),
     };
   };
 

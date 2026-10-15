@@ -61,7 +61,7 @@
       if (!ch) return;
       const name = ch.name || env.names.get(ch.key) || ch.key.replace(/^@/, '');
       const src = yt.avatarUrl(img);
-      const { style, salt } = P.resolveStyle(settings, ch.key);
+      const { style, salt } = P.resolveStyle(settings, ch.key, env.topics[ch.key]);
       const sig = `${env.version}|${ch.key}|${name}|${style.id}|${salt}|${src || ''}`;
       const current = P.overlay.find(host, CLS);
       if (current && current.dataset.sig === sig) return;

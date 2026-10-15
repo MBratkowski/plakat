@@ -5,7 +5,8 @@
   if (!P || window.top !== window) return;
 
   // Shared by the passes. `version` invalidates every overlay signature at once.
-  const env = { settings: null, version: 0, names: new Map() };
+  // `topics` is the stored channel -> topic map (src/store/seen.js).
+  const env = { settings: null, topics: {}, version: 0, names: new Map() };
   let started = false;
 
   // Each pass gets its own IntersectionObserver, so only elements near the viewport render.
@@ -38,10 +39,21 @@
   };
   const scanners = [P.thumbnailPass, P.avatarPass].map(createScanner);
 
+  // The loaded watch or channel page tells the channel's topic once per page.
+  let hintedPage = null;
+  const recordPageHints = () => {
+    if (!env.settings?.enabled) return;
+    const hints = P.yt.pageHints();
+    if (!hints || hints.id === hintedPage) return;
+    hintedPage = hints.id;
+    P.seenRecorder.page(hints);
+  };
+
   // The theme follows the page's channel, which can change with any DOM update.
   const scan = () => {
     scanners.forEach((s) => s.scan());
-    P.theme.apply(env.settings);
+    recordPageHints();
+    P.theme.apply(env.settings, env.topics);
   };
   let scanTimer = 0;
   const scheduleScan = () => {
@@ -57,11 +69,17 @@
     root.classList.toggle('plakat-hover', !!env.settings?.hoverReveal);
   };
 
+  // Re-runs the passes and the theme; only overlays whose signature changed are rebuilt.
+  const refresh = () => {
+    P.theme.apply(env.settings, env.topics);
+    scanners.forEach((s) => s.rerender());
+  };
+
   const rerenderAll = () => {
     env.version++;
     P.overlay.clearCache();
     applyRootClasses();
-    P.theme.apply(env.settings);
+    P.theme.apply(env.settings, env.topics);
     scanners.forEach((s) => s.rerender());
   };
 
@@ -94,12 +112,13 @@
   const start = async () => {
     try {
       env.settings = await P.loadSettings();
+      env.topics = await P.loadTopics();
     } catch {
       return;
     }
     applyRootClasses();
     // Colours before the fonts arrive, so the page does not flash in YouTube's own theme for long.
-    P.theme.apply(env.settings);
+    P.theme.apply(env.settings, env.topics);
     await P.loadFonts();
     started = true;
     new MutationObserver(scheduleScan).observe(document.documentElement, {
@@ -115,9 +134,12 @@
   };
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local' || !changes.settings || !started) return;
-    env.settings = P.normalizeSettings(changes.settings.newValue);
-    rerenderAll();
+    if (area !== 'local' || !started) return;
+    if (changes.topics) env.topics = changes.topics.newValue || {};
+    if (changes.settings) {
+      env.settings = P.normalizeSettings(changes.settings.newValue);
+      rerenderAll();
+    } else if (changes.topics && env.settings.byTopic) refresh();
   });
 
   start();
