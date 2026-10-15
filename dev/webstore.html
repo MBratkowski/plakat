@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plakat — Chrome Web Store graphics</title>
+<!--
+  Slides for the Chrome Web Store, rendered by dev/webstore.py:
+  ?slide=1..5&lang=pl|en  1280×800 screenshots
+  ?slide=tile             440×280 small promo tile
+  ?slide=marquee          1400×560 marquee tile
+  Posters and avatars are rendered live by the engine; feed and settings shots come from
+  webstore/.captures/, which dev/webstore.py takes from the mock with the extension loaded.
+-->
+<style>
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-ext-400-normal.woff2") format("woff2"); font-weight: 400; unicode-range: U+0100-024F; }
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-ext-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0100-024F; }
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+  @font-face { font-family: "UI"; src: url("../fonts/inter-tight-latin-ext-900-normal.woff2") format("woff2"); font-weight: 900; unicode-range: U+0100-024F; }
+  :root { --paper: #f1ede4; --ink: #111111; --body: #3d3a35; --muted: #5f5a52; --red: #e5322d; --blue: #1f4fd8; --shadow: 0 2px 4px rgba(20, 16, 10, 0.1), 0 16px 36px rgba(20, 16, 10, 0.18); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); }
+  body { font-family: "UI", "Helvetica Neue", Arial, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  svg { display: block; width: 100%; height: 100%; }
+  .frame { position: relative; overflow: hidden; background: var(--paper); }
+  .slide { width: 1280px; height: 800px; padding: 44px 64px; display: flex; flex-direction: column; }
+  .meta { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-size: 15px; font-weight: 700; }
+  .meta span + span { font-weight: 400; }
+  h1 { margin: 30px 0 10px -2px; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.055em; }
+  h1 em { font-style: normal; color: var(--red); }
+  .sub { margin: 0 0 30px; max-width: 900px; font-size: 22px; line-height: 1.4; color: var(--body); }
+  .stage { flex: 1; min-height: 0; position: relative; }
+  .stage.middle { display: flex; align-items: center; padding-bottom: 20px; }
+  .screen { background: #0f0f0f; border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+  .screen img { display: block; width: 100%; }
+  .shot { display: block; border-radius: 14px; box-shadow: var(--shadow); }
+  .lab { display: flex; align-items: center; gap: 10px; margin: 0 0 8px 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #8a8a8a; }
+  .lab i { width: 10px; height: 10px; border-radius: 50%; background: #3a3a3a; }
+  .lab.on { color: #f1ede4; } .lab.on i { background: var(--red); }
+  .poster { border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .av { border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 4px var(--paper), 0 10px 24px rgba(20, 16, 10, 0.22); }
+  .grid { display: grid; gap: 22px 22px; }
+  .name { margin-top: 10px; font-size: 16px; font-weight: 700; }
+  .name span { font-weight: 400; color: var(--muted); }
+  .circle { position: absolute; border-radius: 50%; background: var(--blue); }
+</style>
+<script src="../src/core/font-faces.js"></script>
+<script src="../src/core/i18n.js"></script>
+<script src="../src/core/random.js"></script>
+<script src="../src/core/vdom.js"></script>
+<script src="../src/core/color.js"></script>
+<script src="../src/core/typography.js"></script>
+<script src="../src/core/text.js"></script>
+<script src="../src/engines/kit.js"></script>
+<script src="../src/engines/swiss.js"></script>
+<script src="../src/engines/bauhaus.js"></script>
+<script src="../src/engines/konstrukt.js"></script>
+<script src="../src/engines/jazz.js"></script>
+<script src="../src/engines/ma.js"></script>
+<script src="../src/engines/terminal.js"></script>
+<script src="../src/engines/kod.js"></script>
+<script src="../src/poster/styles.js"></script>
+<script src="../src/poster/render.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const P = Plakat;
+const q = new URLSearchParams(location.search);
+const slide = q.get('slide') || '1';
+const lang = q.get('lang') || 'en';
+const CAP = '../webstore/.captures/';
+
+const COPY = {
+  en: {
+    meta: 'Plakat — Chrome extension for YouTube',
+    1: ['Your feed, redrawn <em>as posters.</em>', 'Every thumbnail and channel avatar becomes a generative poster. Each channel gets its own series.'],
+    2: ['Same feed. <em>A different wall.</em>', 'Alt+Shift+P toggles the posters on YouTube. Hover any poster to see the original.'],
+    3: ['Five styles. <em>Each channel gets one.</em>', 'Swiss, Bauhaus, Constructivist, ’60s jazz and Ma 間, plus Terminal and Kod for tech channels.'],
+    4: ['Avatars from <em>the same series.</em>', 'The channel’s palette and forms return in the circle next to every title: in the feed, in search and in your subscriptions.'],
+    5: ['Pin it, reroll it, <em>or design your own.</em>', 'The settings preview every channel on its real titles. Build your own styles and share them as JSON. Settings are in Polish.'],
+    off: 'Plakat off', on: 'Plakat on',
+    styles: { swiss: 'Swiss', bauhaus: 'Bauhaus', konstrukt: 'Constructivism', jazz: 'Jazz ’60', ma: 'Ma 間', terminal: 'Terminal', kod: 'Kod' },
+    optional: 'opt-in',
+  },
+  pl: {
+    meta: 'Plakat — rozszerzenie Chrome do YouTube’a',
+    1: ['Twój feed <em>jako plakaty.</em>', 'Każda miniatura i każdy awatar kanału staje się generatywnym plakatem. Każdy kanał dostaje własną serię.'],
+    2: ['Ten sam feed. <em>Inna ściana.</em>', 'Alt+Shift+P przełącza plakaty na YouTube. Najechanie na plakat pokazuje oryginał.'],
+    3: ['Pięć stylów. <em>Każdy kanał dostaje jeden.</em>', 'Szwajcarski, Bauhaus, konstruktywizm, jazz z lat 60. i Ma 間, a dla kanałów technologicznych Terminal i Kod.'],
+    4: ['Awatar <em>z tej samej serii.</em>', 'Paleta i formy kanału wracają w kółku obok każdego tytułu: w feedzie, w wynikach wyszukiwania i w subskrypcjach.'],
+    5: ['Przypnij, przelosuj <em>albo zaprojektuj własny.</em>', 'Ustawienia pokazują każdy kanał na jego prawdziwych tytułach. Własne style wymienisz jako JSON.'],
+    off: 'Plakat wyłączony', on: 'Plakat włączony',
+    styles: { swiss: 'Szwajcarski', bauhaus: 'Bauhaus', konstrukt: 'Konstruktywizm', jazz: 'Jazz ’60', ma: 'Ma 間', terminal: 'Terminal', kod: 'Kod' },
+    optional: 'do włączenia',
+  },
+}[lang];
+
+// Sample channels: the same ones as the landing page, so the series match across materials.
+const CHANNELS = {
+  swiss: ['Design Talks', 'Why Swiss Design Still Matters', 0],
+  bauhaus: ['Kanał Techniczny', 'Homelab #12: a home server for 500 zł', 2],
+  konstrukt: ['Rozmowy o biznesie', 'Podcast ep. 47: building a startup without investors', 1],
+  jazz: ['Blue Note Hour', 'Kind of Blue at 65: the session, take by take', 1],
+  ma: ['Slow Kyoto', 'A quiet morning in Arashiyama', 1],
+  terminal: ['Linux Weekly', 'Kernel 7.2: what changed under the hood #31', 0],
+  kod: ['Kotlin Corner', 'Coroutines without the confusion', 0],
+};
+const style = (id) => P.BUILTIN_STYLES.find((s) => s.id === id);
+const el = (tag, cls, ...kids) => { const e = document.createElement(tag); if (cls) e.className = cls; e.append(...kids); return e; };
+const html = (tag, cls, markup) => { const e = el(tag, cls); e.innerHTML = markup; return e; };
+const img = (src, cls) => Object.assign(el('img', cls), { src });
+const poster = (id, { w, portrait = false, vid = id + '1', title } = {}) => {
+  const [name, t, salt] = CHANNELS[id];
+  const box = el('div', 'poster');
+  box.style.width = w + 'px';
+  box.style.height = (portrait ? w * 16 / 9 : w * 9 / 16) + 'px';
+  box.appendChild(P.toDom(P.render({ style: style(id), salt, title: title || t, channelName: name, channelKey: name.toLowerCase(), vid, thumbUrl: `thumbs/t${(id.length + 1) % 8}.jpg`, W: 480, H: portrait ? 853 : 270 })));
+  return box;
+};
+const avatar = (id, px) => {
+  const [name, , salt] = CHANNELS[id];
+  const box = el('div', 'av');
+  box.style.width = box.style.height = px + 'px';
+  box.appendChild(P.toDom(P.renderAvatar({ style: style(id), salt, channelName: name, channelKey: name.toLowerCase(), thumbUrl: `thumbs/t${(id.length + 4) % 8}.jpg` })));
+  return box;
+};
+const head = (n) => [
+  html('div', 'meta', `<span>${COPY.meta}</span><span>0${n} / 05</span>`),
+  html('h1', '', COPY[n][0]),
+  html('p', 'sub', COPY[n][1]),
+];
+
+const SLIDES = {
+  1: () => {
+    const stage = el('div', 'stage', el('div', 'screen', img(CAP + 'feed-on.png')));
+    return [...head(1), stage];
+  },
+  2: () => {
+    const screen = el('div', 'screen',
+      html('p', 'lab', `<i></i>${COPY.off}`), img(CAP + 'row-off.png'),
+      html('p', 'lab on', `<i></i>${COPY.on}`), img(CAP + 'row-on.png'));
+    screen.lastElementChild.previousElementSibling.style.marginTop = '14px';
+    return [...head(2), el('div', 'stage', screen)];
+  },
+  3: () => {
+    const grid = el('div', 'grid');
+    grid.style.gridTemplateColumns = 'repeat(4, 262px)';
+    for (const id of ['swiss', 'bauhaus', 'konstrukt', 'jazz', 'ma', 'terminal', 'kod']) {
+      const extra = style(id).optIn ? ` <span>· ${COPY.optional}</span>` : '';
+      grid.append(el('div', '', poster(id, { w: 262 }), html('div', 'name', COPY.styles[id] + extra)));
+    }
+    return [...head(3), el('div', 'stage middle', grid)];
+  },
+  4: () => {
+    const grid = el('div', 'grid');
+    grid.style.gridTemplateColumns = 'repeat(5, 210px)';
+    grid.style.columnGap = '26px';
+    grid.style.alignItems = 'end';
+    for (const id of ['swiss', 'bauhaus', 'konstrukt', 'jazz', 'ma']) {
+      const col = el('div', '');
+      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:16px';
+      col.append(avatar(id, 132), poster(id, { w: 210 }), html('div', 'name', CHANNELS[id][0]));
+      grid.append(col);
+    }
+    return [...head(4), el('div', 'stage middle', grid)];
+  },
+  5: () => {
+    const stage = el('div', 'stage');
+    const opts = img(CAP + 'options.png', 'shot');
+    opts.style.cssText = 'position:absolute;left:0;top:0;width:760px';
+    const ed = img(CAP + 'editor.png', 'shot');
+    ed.style.cssText = 'position:absolute;right:0;top:40px;width:560px';
+    stage.append(opts, ed);
+    return [...head(5), stage];
+  },
+  // Promo tiles can't be localized, so they carry only the wordmark.
+  tile: () => tile(440, 280),
+  marquee: () => tile(1400, 560),
+};
+
+const tile = (W, H) => {
+  const k = H / 280;
+  // Wordmark on the left third, a small collage on the right, kept apart.
+  const word = html('div', '', 'Plakat');
+  word.style.cssText = `position:absolute;left:${24 * k}px;top:${H / 2 - 40 * k}px;font-weight:900;font-size:${54 * k}px;letter-spacing:-0.06em;line-height:1`;
+  const bar = el('div', '');
+  bar.style.cssText = `position:absolute;left:${26 * k}px;top:${H / 2 + 26 * k}px;width:${96 * k}px;height:${7 * k}px;background:var(--red)`;
+  const dot = el('div', 'circle');
+  dot.style.cssText += `width:${190 * k}px;height:${190 * k}px;right:${-34 * k}px;top:${-26 * k}px`;
+  const a = poster('swiss', { w: 150 * k, title: 'Five styles, one wall #5' });
+  a.style.cssText += `position:absolute;left:${W - 236 * k}px;top:${48 * k}px;transform:rotate(-5deg)`;
+  const b = poster('konstrukt', { w: 82 * k, portrait: true, title: 'Every channel is a series' });
+  b.style.cssText += `position:absolute;left:${W - 112 * k}px;top:${62 * k}px;transform:rotate(6deg)`;
+  const c = avatar('jazz', 56 * k);
+  c.style.cssText += `position:absolute;left:${W - 198 * k}px;top:${168 * k}px`;
+  return [dot, a, b, c, word, bar];
+};
+
+(async () => {
+  await P.loadFonts();
+  await document.fonts.ready;
+  const [w, h] = { tile: [440, 280], marquee: [1400, 560] }[slide] || [1280, 800];
+  const frame = el('div', slide in { tile: 1, marquee: 1 } ? 'frame' : 'frame slide');
+  frame.id = 'frame';
+  frame.style.width = w + 'px';
+  frame.style.height = h + 'px';
+  frame.append(...SLIDES[slide]());
+  document.getElementById('root').appendChild(frame);
+  document.documentElement.lang = lang;
+  await Promise.all([...document.images].map((i) => i.decode().catch(() => null)));
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>

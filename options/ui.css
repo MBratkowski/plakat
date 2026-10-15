@@ -46,6 +46,7 @@ kbd { font: 600 11px/1 "Plakat Inter Tight", sans-serif; border: 1px solid var(-
 .btn.ghost { border-color: transparent; padding-left: 8px; padding-right: 8px; }
 .btn.ghost:hover { background: var(--paper-2); color: var(--ink); }
 .btn.danger:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.btn:disabled, .btn:disabled:hover { opacity: 0.4; cursor: default; background: transparent; color: var(--ink); border-color: var(--ink); }
 .btn.small { padding: 7px 11px; font-size: 12px; }
 .btn:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 

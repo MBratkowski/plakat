@@ -30,6 +30,8 @@
         "src/engines/konstrukt.js",
         "src/engines/jazz.js",
         "src/engines/ma.js",
+        "src/engines/terminal.js",
+        "src/engines/kod.js",
         "src/poster/styles.js",
         "src/poster/render.js",
         "src/store/settings.js",

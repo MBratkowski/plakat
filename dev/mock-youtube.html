@@ -69,6 +69,10 @@
   ytd-comments { padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
   ytd-comment-view-model, ytd-comment-renderer { display: flex; gap: 16px; }
   yt-page-header-view-model { display: flex; gap: 24px; align-items: center; padding: 0 24px; }
+  /* ?static=1: a still feed for store screenshots, without dev headings or timed changes */
+  html.static h2, html.static ytd-masthead { display: none; }
+  html.static .grid { padding-top: 24px; }
+  html.static #shorts, html.static #search { margin-top: 64px; }
 </style>
 </head>
 <body>
@@ -191,7 +195,11 @@ if (location.pathname.startsWith('/@')) {
     <yt-dynamic-text-view-model><h1>Design Talks</h1></yt-dynamic-text-view-model></yt-page-header-view-model>`);
 }
 
+const still = new URLSearchParams(location.search).has('static');
+if (still) document.documentElement.classList.add('static');
+
 // Late hydration: a card without a title that appears after 1.2 s
+if (!still) {
 const late = newCard(0);
 const lateH3 = late.querySelector('h3'); const lateTitle = lateH3.innerHTML; setHTML(lateH3, ''); lateH3.removeAttribute('title');
 document.getElementById('new').appendChild(late);
@@ -211,6 +219,7 @@ setTimeout(() => {
   c.querySelector('#avatar img').setAttribute('src', avatarSrc('@designtalks'));
   c.querySelector('ytd-channel-name a').textContent = 'Design Talks';
 }, 2000);
+}
 </script>
 </body>
 </html>

@@ -52,7 +52,7 @@ def static_checks():
         base = (ROOT / html).parent
         return [str((base / s).resolve().relative_to(ROOT)) for s in srcs]
 
-    for html, expected in [("options/options.html", shared), ("popup/popup.html", shared), ("dev/gallery.html", rendering)]:
+    for html, expected in [("options/options.html", shared), ("popup/popup.html", shared), ("dev/gallery.html", rendering), ("dev/webstore.html", rendering)]:
         got = [s for s in page_scripts(html) if s.startswith("src/")]
         check(f"{html} loads the shared scripts in manifest order", got == expected, f"got {got}")
 
@@ -272,6 +272,15 @@ def options_checks(context, page, ext_id, with_editor):
         .map((s) => s.getAttribute('data-palette'))""")
     check("options: row avatar matches the row's thumbnails", len(set(row_pal)) == 1, row_pal)
     opts.screenshot(path=str(OUT / "options.png"), full_page=True)
+
+    # Privacy: the data note links the policy, and clearing forgets every seen channel.
+    check("options: data note links the privacy policy", (opts.get_attribute("#dataNote a", "href") or "").endswith("/plakat/privacy.html"))
+    opts.click("#clearSeen")
+    opts.click("#clearSeen")
+    opts.wait_for_timeout(300)
+    left = opts.evaluate("async () => Object.keys((await chrome.storage.local.get('seen')).seen || {}).length")
+    check("options: clearing empties the channel list", left == 0 and opts.locator(".ch-row").count() == 0, left)
+    check("options: clear button is disabled on an empty list", opts.is_disabled("#clearSeen"))
 
     if with_editor:
         opts.click("[data-act=dup]")

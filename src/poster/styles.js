@@ -51,9 +51,33 @@
         ['#e9e4d8', '#2b2b2b', '#2b2b2b', '#8f8778', '#2b2b2b'],
       ],
     },
+    // Tech styles. optIn keeps them out of the default pool, so channels that already
+    // have a look keep it; users add them to the pool on the options page.
+    {
+      id: 'terminal', name: P.t('builtinTerminal'), engine: 'terminal', params: {}, optIn: true,
+      // [screen, text, prompt and cursor, dim text, extra]
+      palettes: [
+        ['#0c140f', '#8af5a4', '#e3ffe9', '#4f9a66', '#8af5a4'],
+        ['#150e06', '#ffb547', '#ffe6b3', '#a06a22', '#ffb547'],
+        ['#0e2a6e', '#e9eefc', '#ffd84d', '#8aa6e6', '#e9eefc'],
+        ['#f1ede4', '#1b1b1b', '#c8201e', '#7d776b', '#1b1b1b'],
+        ['#121417', '#e8e6e3', '#5ee08a', '#7b8494', '#e8e6e3'],
+      ],
+    },
+    {
+      id: 'kod', name: P.t('builtinKod'), engine: 'kod', params: {}, optIn: true,
+      // [editor, text, keywords and numbers, comments and gutter, strings]
+      palettes: [
+        ['#1b1d23', '#d7dae0', '#ff7ab2', '#6b7385', '#ffcc66'],
+        ['#0f1724', '#cfd8e8', '#7aa2f7', '#5d6a86', '#9ece6a'],
+        ['#fbfaf7', '#24292f', '#cf222e', '#8b949e', '#0a3069'],
+        ['#fdf6e3', '#4f6168', '#d33682', '#93a1a1', '#1f8a82'],
+        ['#22212c', '#f8f8f2', '#ff79c6', '#7970a9', '#f1fa8c'],
+      ],
+    },
   ];
   for (const s of P.BUILTIN_STYLES) s.builtin = true;
-  P.BUILTIN_POOL = P.BUILTIN_STYLES.map((s) => s.id);
+  P.BUILTIN_POOL = P.BUILTIN_STYLES.filter((s) => !s.optIn).map((s) => s.id);
 
   P.allStyles = (settings) => [...P.BUILTIN_STYLES, ...((settings && settings.customStyles) || [])];
 
@@ -66,7 +90,8 @@
     const pinned = !!style;
     if (!style) {
       const pool = styles.filter((s) => (settings.pool || P.BUILTIN_POOL).includes(s.id));
-      const list = pool.length ? pool : styles;
+      // An empty pool falls back to every style that is not opt-in, as before tech styles existed.
+      const list = pool.length ? pool : styles.filter((s) => !s.optIn);
       style = list[Math.floor(P.rng(`pool|${channelKey}|${salt}`)() * list.length)];
     }
     return { style, salt, pinned };
