@@ -1,5 +1,5 @@
 // User settings in chrome.storage.local:
-//   settings: { enabled, hoverReveal, avatars, commentAvatars, pool[], customStyles[],
+//   settings: { enabled, hoverReveal, avatars, commentAvatars, theme, pool[], customStyles[],
 //               channels{ key: { styleId?, salt? } }, byTopic, topicPools{ topic: styleId[] } }
 (() => {
   const P = (globalThis.Plakat ??= {});
@@ -10,6 +10,8 @@
     avatars: true,
     // Comment authors are people, not channels with a series: off unless asked for.
     commentAvatars: false,
+    // Restyling YouTube itself is opt-in: 'off', 'paper' or 'channel' (P.THEMES).
+    theme: 'off',
     pool: P.BUILTIN_POOL.slice(),
     customStyles: [],
     channels: {},
@@ -19,11 +21,14 @@
     topicPools: { tech: ['terminal', 'kod'] },
   };
 
+  P.THEMES = ['off', 'paper', 'channel'];
+
   P.normalizeSettings = (s) => {
     s = s || {};
     return {
       ...P.DEFAULTS,
       ...s,
+      theme: P.THEMES.includes(s.theme) ? s.theme : P.DEFAULTS.theme,
       pool: Array.isArray(s.pool) ? s.pool : P.DEFAULTS.pool.slice(),
       customStyles: Array.isArray(s.customStyles) ? s.customStyles : [],
       channels: s.channels && typeof s.channels === 'object' ? { ...s.channels } : {},

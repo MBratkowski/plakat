@@ -21,6 +21,9 @@
 .switch-row { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; }
 .switch-row input { margin-top: 2px; }
 .switch-row.off { opacity: 0.55; cursor: default; }
+.select-row { grid-column: 1 / -1; align-items: center; cursor: default; }
+.select-row > span { flex: 1; }
+.select-row select { flex: none; min-width: 180px; }
 
 /* Thumbnails and avatars */
 .thumb { aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: var(--paper-2); }

@@ -29,6 +29,11 @@ Plakat replaces the thumbnails on YouTube with generative posters in five design
 - **Stays out of the way.** Hover shows the original, Alt+Shift+P toggles everything, YouTube's duration and progress badges stay on top.
 - **Yours to edit.** Pin a style per channel, reroll a series, or build your own style in the editor and share it as JSON.
 - **Style by topic (opt-in).** Plakat recognises a channel's topic (tech, reviews, music, gaming, cooking, sport, design) from its titles and from the keywords and category of its watch and channel pages, and can draw its style from that topic's pool: tech channels get Terminal and Kod. A topic, once recognised, stays, and channels without one keep their look.
+- **YouTube in poster colours (optional).** A theme repaints YouTube itself: paper and ink everywhere, or the palette and title typeface of the channel's series on its watch and channel pages. Square corners, poster typefaces, light and dark, at least 4.5:1 text contrast. The player is left alone.
+
+<p align="center">
+  <img src="docs/images/theme-watch-light.jpg" alt="The watch page with the theme off and with the channel palette theme: the page takes the colours and title typeface of the channel's posters" width="100%">
+</p>
 
 ## Styles
 
@@ -66,7 +71,7 @@ The interface is in Polish.
 |---|---|
 | **Hover** | shows the original thumbnail or avatar (can be turned off) |
 | **Alt+Shift+P** | turns posters on and off on the page |
-| **Ogólne** | on/off, hover reveal, channel avatars, avatars in comments |
+| **Ogólne** | on/off, hover reveal, channel avatars, avatars in comments, YouTube theme (off, paper and ink, channel palette) |
 | **Kanały** | every channel you have seen, with its avatar and three posters on its real titles; pin a style or reroll the series |
 | **Style** | choose which styles take part in the draw, duplicate one to edit it, import and export JSON |
 | **Tematy** | turn on style by topic and choose which styles each topic draws from (an empty pool uses the normal one); every channel row shows its detected topic |
@@ -95,6 +100,7 @@ flowchart LR
 - **Topics.** `src/core/topics.js` holds the keyword table and scores a channel's titles, name, page keywords and category; a topic is given only when one clearly leads. It is stored once in `topics` in `chrome.storage.local` and never recomputed, so more titles cannot change a channel's look. Meta tags are read only on the page the document was loaded for, because YouTube's SPA navigation leaves them stale. No extra requests.
 - **Rendering.** Engines return a virtual SVG tree (`h(tag, attrs, ...children)`), which the content script builds with `createElementNS`. YouTube enforces Trusted Types, so there is no `innerHTML` anywhere.
 - **YouTube's DOM.** Selectors follow links, ids and custom element names, never class names, which YouTube renames often. Thumbnails are any `/watch?v=` or `/shorts/` link around an `<img>`; avatars are keyed by the nearest `/@handle` or `/channel/…` link. Overlays sit right after the original image and carry a signature that catches recycled elements; an `IntersectionObserver` per pass and a render cache keep scrolling smooth.
+- **Theme.** `src/content/theme.js` writes one `<style>` that overrides YouTube's `--yt-spec-*` colour tokens for both of its themes (`html[dark]`). In channel mode the colours come from `P.paletteFor()`, the same first draw of the channel RNG that gives the posters their palette, so nothing a poster draws changes. Typography and square corners are static rules in `content.css` under `html.plakat-theme`, and the player gets YouTube's own token values back.
 
 ## Architecture
 
@@ -105,7 +111,7 @@ src/core/       primitives: seeded RNG, virtual SVG, colour, typography, title a
 src/engines/    the five style engines and their shared kit
 src/poster/     built-in styles and the render pipeline (P.render, P.renderAvatar)
 src/store/      settings, seen channels and their topics in chrome.storage.local
-src/content/    YouTube adapter: selectors, overlays, thumbnail and avatar passes
+src/content/    YouTube adapter: selectors, overlays, thumbnail and avatar passes, optional theme
 options/        options page and style editor
 popup/          toolbar popup
 _locales/pl/    every user-facing string

@@ -49,9 +49,11 @@
     P.seenRecorder.page(hints);
   };
 
+  // The theme follows the page's channel, which can change with any DOM update.
   const scan = () => {
     scanners.forEach((s) => s.scan());
     recordPageHints();
+    P.theme.apply(env.settings, env.topics);
   };
   let scanTimer = 0;
   const scheduleScan = () => {
@@ -67,13 +69,17 @@
     root.classList.toggle('plakat-hover', !!env.settings?.hoverReveal);
   };
 
-  // Re-runs the passes on visible elements; only overlays whose signature changed are rebuilt.
-  const refresh = () => scanners.forEach((s) => s.rerender());
+  // Re-runs the passes and the theme; only overlays whose signature changed are rebuilt.
+  const refresh = () => {
+    P.theme.apply(env.settings, env.topics);
+    scanners.forEach((s) => s.rerender());
+  };
 
   const rerenderAll = () => {
     env.version++;
     P.overlay.clearCache();
     applyRootClasses();
+    P.theme.apply(env.settings, env.topics);
     scanners.forEach((s) => s.rerender());
   };
 
@@ -111,6 +117,8 @@
       return;
     }
     applyRootClasses();
+    // Colours before the fonts arrive, so the page does not flash in YouTube's own theme for long.
+    P.theme.apply(env.settings, env.topics);
     await P.loadFonts();
     started = true;
     new MutationObserver(scheduleScan).observe(document.documentElement, {

@@ -39,6 +39,7 @@
         "src/store/seen.js",
         "src/content/youtube.js",
         "src/content/overlay.js",
+        "src/content/theme.js",
         "src/content/seen-recorder.js",
         "src/content/thumbnails.js",
         "src/content/avatars.js",
